@@ -13,6 +13,16 @@ export const SPEC_META: Record<Specialite, { icon: LucideIcon; label: string; te
   GRIMP: { icon: Mountain, label: 'GRIMP', text: 'text-grimp', soft: 'bg-grimp-soft', solid: 'bg-grimp' },
 }
 
+/** Couleurs de surbrillance sur le tableau (spécialités + fonctions Chef / Chauffeur) */
+export const CAP_META: Record<Specialite | 'CHEF' | 'CHAUFFEUR', { label: string; soft: string; text: string; ring: string; solid: string }> = {
+  PLONGEUR: { label: 'Plongeur', soft: 'bg-plong-soft', text: 'text-plong', ring: 'ring-plong', solid: 'bg-plong' },
+  HAZMAT: { label: 'HAZMAT', soft: 'bg-hazmat-soft', text: 'text-hazmat', ring: 'ring-amber-500', solid: 'bg-amber-500' },
+  RISC: { label: 'RISC', soft: 'bg-risc-soft', text: 'text-risc', ring: 'ring-risc', solid: 'bg-risc' },
+  GRIMP: { label: 'GRIMP', soft: 'bg-grimp-soft', text: 'text-grimp', ring: 'ring-grimp', solid: 'bg-grimp' },
+  CHEF: { label: 'Chef', soft: 'bg-sky-100', text: 'text-sky-800', ring: 'ring-sky-600', solid: 'bg-sky-600' },
+  CHAUFFEUR: { label: 'Chauffeur', soft: 'bg-teal-100', text: 'text-teal-800', ring: 'ring-teal-600', solid: 'bg-teal-600' },
+}
+
 /** `icon` : pastille compacte (postes) — `label` : badge complet (listes, fiches) */
 export function SpecBadge({ sp, variant = 'label', className }: { sp: Specialite; variant?: 'icon' | 'label'; className?: string }) {
   const m = SPEC_META[sp]

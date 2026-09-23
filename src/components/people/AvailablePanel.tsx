@@ -7,7 +7,7 @@ import { GRADE_RANK, SPECIALITES, type Person, type PersonStatus } from '../../d
 import { useDerived } from '../../store/useDerived'
 import { useUI, type CapFilter, type StatusFilter } from '../../store/useUI'
 import type { DragData } from '../board/PostSlot'
-import { Avatar, MissionTag, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../ui/badges'
+import { Avatar, CAP_META, MissionTag, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../ui/badges'
 
 const STATUS_TABS: { id: StatusFilter; label: string }[] = [
   { id: 'DISPO', label: 'Disponibles' },
@@ -16,8 +16,8 @@ const STATUS_TABS: { id: StatusFilter; label: string }[] = [
   { id: 'TOUS', label: 'Tous' },
 ]
 
-const CAPS: { id: Exclude<CapFilter, null>; label: string; cls?: string }[] = [
-  ...SPECIALITES.map((s) => ({ id: s, label: SPEC_META[s].label, cls: `${SPEC_META[s].soft} ${SPEC_META[s].text}` })),
+const CAPS: { id: Exclude<CapFilter, null>; label: string }[] = [
+  ...SPECIALITES.map((s) => ({ id: s, label: SPEC_META[s].label })),
   { id: 'CHEF', label: 'Chef' },
   { id: 'CHAUFFEUR', label: 'Chauffeur' },
 ]
@@ -162,7 +162,7 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
                 aria-pressed={on}
                 className={clsx(
                   'h-7 rounded-full border px-2.5 text-[11px] font-bold tracking-wide uppercase transition-colors',
-                  on ? 'border-ink bg-ink text-white' : clsx('border-transparent', c.cls ?? 'bg-slate-100 text-slate-600', 'hover:border-slate-300'),
+                  on ? clsx('border-transparent text-white shadow-sm', CAP_META[c.id].solid) : clsx('border-transparent', CAP_META[c.id].soft, CAP_META[c.id].text, 'hover:border-slate-300'),
                 )}
               >
                 {c.label}

@@ -1,21 +1,21 @@
 import { useDndContext, useDraggable, useDroppable } from '@dnd-kit/core'
 import clsx from 'clsx'
 import { Plus } from 'lucide-react'
-import { checkPost, personName } from '../../domain/selectors'
+import { checkPost, matchesCap, personName } from '../../domain/selectors'
 import type { Person, Post } from '../../domain/types'
 import { useDerived } from '../../store/useDerived'
 import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
-import { Avatar, MissionTag, SpecBadges } from '../ui/badges'
+import { Avatar, CAP_META, MissionTag, SpecBadges } from '../ui/badges'
 
 export interface DragData { personId: string; from: string | null }
 
 /** Contenu d'une personne dans un poste (réutilisé par l'aperçu de glisser-déposer). */
-export function PersonInline({ person, inMission, dense }: { person: Person; inMission?: boolean; dense?: boolean }) {
+export function PersonInline({ person, inMission, dense, strong }: { person: Person; inMission?: boolean; dense?: boolean; strong?: boolean }) {
   return (
     <span className="flex min-w-0 flex-1 items-center gap-1.5">
       <Avatar person={person} size="xs" />
-      <span className={clsx('truncate font-medium text-slate-800', dense ? 'text-[12px]' : 'text-[12.5px]')}>{personName(person)}</span>
+      <span className={clsx('truncate text-slate-800', strong ? 'font-bold text-ink' : 'font-medium', dense ? 'text-[12px]' : 'text-[12.5px]')}>{personName(person)}</span>
       <SpecBadges specs={person.specialites} variant="icon" />
       {inMission && <MissionTag className="ml-auto" />}
     </span>
@@ -33,6 +33,10 @@ export function PostSlot({ post, locked, label = true }: { post: Post; locked: b
   const pickerPost = useUI((s) => s.picker?.postId)
   const person = personId ? d.personById[personId] : undefined
   const inMission = !!personId && d.status[personId]?.kind === 'EN_MISSION'
+  // Repérage d'une spécialité : les personnes disponibles concernées ressortent, les autres s'effacent.
+  const cap = useUI((s) => s.capFilter)
+  const hl = !!cap && !!person && !inMission && matchesCap(person, cap)
+  const dim = !!cap && !!person && !hl
 
   const { active } = useDndContext()
   const drag = active?.data.current as DragData | undefined
@@ -77,14 +81,16 @@ export function PostSlot({ post, locked, label = true }: { post: Post; locked: b
             onClick={(e) => openPicker(post.id, e.currentTarget)}
             className={clsx(
               'flex h-8 w-full min-w-0 items-center rounded-md border px-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-sky-500',
-              inMission ? 'border-mission/20 bg-mission-soft/60' : 'border-line bg-white hover:border-slate-300 hover:bg-slate-50',
+              hl ? clsx('border-transparent ring-2 shadow-sm', CAP_META[cap!].soft, CAP_META[cap!].ring)
+                : inMission ? 'border-mission/20 bg-mission-soft/60' : 'border-line bg-white hover:border-slate-300 hover:bg-slate-50',
+              dim && 'opacity-35',
               !locked && !inMission && 'cursor-grab active:cursor-grabbing',
               isDragging && 'opacity-30',
               pickerPost === post.id && 'ring-2 ring-sky-500',
               'touch-manipulation',
             )}
           >
-            <PersonInline person={person} inMission={inMission} dense />
+            <PersonInline person={person} inMission={inMission} dense strong={hl} />
           </button>
         ) : (
           <button

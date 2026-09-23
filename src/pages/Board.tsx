@@ -1,4 +1,5 @@
 import { UserCheck } from 'lucide-react'
+import { HighlightBar } from '../components/board/HighlightBar'
 import { CoordinationSection, IncendieSection, SimpleSection } from '../components/board/Sections'
 import { HistoryPanel } from '../components/history/HistoryPanel'
 import { AlertBar } from '../components/layout/AlertBar'
@@ -21,6 +22,7 @@ export function Board() {
     <div className="flex h-full min-h-0">
       <div className="scroll-thin min-w-0 flex-1 space-y-4 overflow-y-auto p-4">
         <AlertBar />
+        <div className="sticky top-0 z-10 -mx-1 bg-canvas/95 px-1 pt-1 pb-1 backdrop-blur-sm"><HighlightBar /></div>
         <IncendieSection />
         <SimpleSection id="ambulances" />
         <SimpleSection id="techniques" min={190} />

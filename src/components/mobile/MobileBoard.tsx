@@ -2,14 +2,16 @@ import clsx from 'clsx'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import type { SectionId, Specialite, Vehicle } from '../../domain/types'
+import { matchesCap } from '../../domain/selectors'
 import { useDerived } from '../../store/useDerived'
 import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
+import { HighlightBar } from '../board/HighlightBar'
 import { MainAction, StateMenu } from '../board/VehicleCard'
 import { PostSlot } from '../board/PostSlot'
 import { SECTION_META, vehiclesOf } from '../board/Sections'
 import { AlertBar } from '../layout/AlertBar'
-import { SpecBadge, StatePill, STATE_META } from '../ui/badges'
+import { CAP_META, SpecBadge, StatePill, STATE_META } from '../ui/badges'
 
 function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
   const [open, setOpen] = useState(false)
@@ -20,10 +22,23 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
   const crew = vehicle.posts.map((p) => assignments[p.id]).filter(Boolean)
   const specs = [...new Set(crew.flatMap((pid) => d.personById[pid]?.specialites ?? []))] as Specialite[]
   const out = status.state === 'EN_MISSION'
+  // Repérage actif : les véhicules qui comptent une personne concernée s'ouvrent et ressortent.
+  const cap = useUI((s) => s.capFilter)
+  const hit = !!cap && !out && crew.some((pid) => d.personById[pid] && matchesCap(d.personById[pid], cap))
+  const expanded = open || hit
 
   return (
-    <div id={`veh-${vehicle.id}`} className={clsx('overflow-hidden rounded-xl border bg-white', out ? 'border-mission/35' : 'border-line', flash && 'ring-4 ring-sky-400/60')}>
-      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="flex w-full items-stretch gap-3 py-2.5 pr-3 pl-0 text-left">
+    <div
+      id={`veh-${vehicle.id}`}
+      className={clsx(
+        'overflow-hidden rounded-xl border bg-white transition-opacity',
+        out ? 'border-mission/35' : 'border-line',
+        flash && 'ring-4 ring-sky-400/60',
+        hit && clsx('ring-2', CAP_META[cap!].ring),
+        cap && !hit && 'opacity-50',
+      )}
+    >
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={expanded} className="flex w-full items-stretch gap-3 py-2.5 pr-3 pl-0 text-left">
         <span className={clsx('w-1.5 shrink-0 rounded-r', STATE_META[status.state].bar)} />
         <span className="min-w-0 flex-1">
           <span className="block truncate font-display text-[17px] leading-tight font-bold tracking-wide text-ink uppercase">{title}</span>
@@ -37,10 +52,10 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
         </span>
         <span className="flex items-center gap-2">
           <StatePill state={status.state} since={status.since} size="sm" />
-          <ChevronDown className={clsx('size-5 text-slate-400 transition-transform', open && 'rotate-180')} />
+          <ChevronDown className={clsx('size-5 text-slate-400 transition-transform', expanded && 'rotate-180')} />
         </span>
       </button>
-      {open && (
+      {expanded && (
         <div className="space-y-1.5 border-t border-line px-3 pt-2.5 pb-3">
           {vehicle.posts.map((p) => <PostSlot key={p.id} post={p} locked={out} />)}
           <div className="flex items-center gap-2 pt-1.5">
@@ -98,6 +113,7 @@ export function MobileBoard() {
   return (
     <div className="space-y-5 px-3 pt-3 pb-4">
       <AlertBar />
+      <div className="sticky top-[calc(3.9rem+env(safe-area-inset-top))] z-20 -mx-3 bg-canvas/95 px-3 py-1 backdrop-blur-sm"><HighlightBar /></div>
       <MobileSection id="incendie" />
       <MobileSection id="ambulances" />
       <MobileSection id="techniques" />

@@ -1,7 +1,7 @@
 import { VEHICLES } from '../data/seed'
 import {
   GRADE_RANK, SPECIALITES,
-  type Person, type PersonStatus, type Post, type Requirement, type Specialite, type Vehicle, type VehicleStatus,
+  type Fonction, type Person, type PersonStatus, type Post, type Requirement, type Specialite, type Vehicle, type VehicleStatus,
 } from './types'
 
 /* ----------------------------------------------------------------- Index statique */
@@ -48,6 +48,11 @@ export function meets(person: Person, r: Requirement): boolean {
   if (r.kind === 'fonction') return person.fonctions.includes(r.value)
   if (r.kind === 'specialite') return person.specialites.includes(r.value)
   return GRADE_RANK[person.grade] >= GRADE_RANK[r.min]
+}
+
+/** La personne possède-t-elle la spécialité ou la fonction recherchée ? */
+export function matchesCap(person: Person, cap: Specialite | Fonction): boolean {
+  return cap === 'CHEF' || cap === 'CHAUFFEUR' ? person.fonctions.includes(cap) : person.specialites.includes(cap)
 }
 
 export function checkPost(person: Person, postId: string): { ok: boolean; missing: string[] } {
