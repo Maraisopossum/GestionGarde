@@ -14,21 +14,21 @@ export function MobileNav() {
     { to: '/plus', label: 'Plus', icon: Menu },
   ]
   return (
-    <nav className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 backdrop-blur">
+    <nav className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 backdrop-blur">
       <ul className="grid grid-cols-5">
         {items.map(({ to, label, icon: Icon, badge, tone }) => (
           <li key={to}>
             <NavLink
               to={to}
               end={to === '/'}
-              className={({ isActive }) => clsx('relative flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold', isActive ? 'text-ink' : 'text-slate-400')}
+              className={({ isActive }) => clsx('relative flex h-14 flex-col items-center justify-center gap-0.5 text-[10.5px] font-semibold', isActive ? 'text-ink' : 'text-ink/45')}
             >
               {({ isActive }) => (
                 <>
                   {isActive && <span className="absolute top-0 h-0.5 w-8 rounded-b bg-ink" />}
                   <Icon className="size-[22px]" strokeWidth={isActive ? 2.4 : 2} />
                   {label}
-                  {!!badge && <span className={clsx('absolute top-1.5 left-1/2 ml-2 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-bold text-white', tone)}>{badge}</span>}
+                  {!!badge && <span className={clsx('absolute top-1.5 left-1/2 ml-2 grid h-4 min-w-4 place-items-center rounded-full px-1 text-[10px] font-semibold text-white', tone)}>{badge}</span>}
                 </>
               )}
             </NavLink>

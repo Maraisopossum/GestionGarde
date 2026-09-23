@@ -1,15 +1,18 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter Variable', system-ui, sans-serif;
-  --font-display: 'Barlow Condensed', 'Inter Variable', system-ui, sans-serif;
+  /* Design system « Lovable » (DESIGN.md) — Camera Plain remplacée par Instrument Sans (libre) */
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #0f1d33;
-  --color-ink-2: #172a47;
-  --color-ink-3: #22385c;
-  --color-canvas: #eef1f5;
-  --color-line: #dde3ea;
-  --color-muted: #64748b;
+  --color-ink: #1c1c1c; /* charbon : texte, surfaces sombres */
+  --color-ink-2: #2a2a29;
+  --color-ink-3: #3a3a38;
+  --color-canvas: #f7f4ed; /* crème : fond de page */
+  --color-paper: #fcfbf8; /* blanc cassé : cartes, champs */
+  --color-line: #eceae4; /* bordure chaude passive */
+  --color-muted: #5f5f5d;
+  --color-cream: #f7f4ed;
 
   --color-ok: #15803d;
   --color-ok-soft: #e7f6ec;
@@ -35,18 +38,27 @@ html, body, #root { height: 100%; }
 body {
   margin: 0;
   background: var(--color-canvas);
-  color: #0f172a;
+  color: #1c1c1c;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
-  font-feature-settings: 'tnum' 1, 'cv11' 1;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Ombre interne des boutons sombres (signature du design system) */
+@utility shadow-inset {
+  box-shadow: rgb(255 255 255 / 0.2) 0 0.5px 0 0 inset, rgb(0 0 0 / 0.2) 0 0 0 0.5px inset, rgb(0 0 0 / 0.05) 0 1px 2px 0;
+}
+/* Focus doux et diffus */
+@utility shadow-focus {
+  box-shadow: rgb(0 0 0 / 0.1) 0 4px 12px;
 }
 
 .pt-safe { padding-top: env(safe-area-inset-top); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 
 /* Barres de défilement discrètes */
-.scroll-thin { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.scroll-thin { scrollbar-width: thin; scrollbar-color: rgb(28 28 28 / 0.18) transparent; }
 
 @keyframes pulse-ring { 0%,100% { box-shadow: 0 0 0 0 rgb(220 38 38 / .35) } 50% { box-shadow: 0 0 0 4px rgb(220 38 38 / 0) } }
 .pulse-danger { animation: pulse-ring 2.4s ease-in-out infinite; }

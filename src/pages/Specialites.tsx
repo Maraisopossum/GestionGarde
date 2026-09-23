@@ -24,18 +24,18 @@ export function Specialites() {
             .filter((p) => p.specialites.includes(sp))
             .sort((a, b) => ORDER[d.status[a.id].kind] - ORDER[d.status[b.id].kind] || a.nom.localeCompare(b.nom))
           return (
-            <section key={sp} className={clsx('overflow-hidden rounded-xl border bg-white', dispo === 0 ? 'border-mission' : 'border-line')}>
+            <section key={sp} className={clsx('overflow-hidden rounded-xl border bg-paper', dispo === 0 ? 'border-mission' : 'border-line')}>
               <header className={clsx('flex items-center gap-3 px-4 py-3', dispo === 0 ? 'bg-mission text-white' : m.soft)}>
-                <span className={clsx('grid size-10 place-items-center rounded-lg', dispo === 0 ? 'bg-white/15' : 'bg-white')}>
+                <span className={clsx('grid size-10 place-items-center rounded-lg', dispo === 0 ? 'bg-white/15' : 'bg-paper')}>
                   <Icon className={clsx('size-6', dispo === 0 ? 'text-white' : m.text)} strokeWidth={2.25} />
                 </span>
                 <div>
-                  <h2 className={clsx('font-display text-[21px] leading-none font-bold tracking-wide uppercase', dispo === 0 ? 'text-white' : m.text)}>{m.label}</h2>
-                  <p className={clsx('mt-1 text-[12.5px]', dispo === 0 ? 'text-white/85' : 'text-slate-600')}>{d.specialiteTotal[sp].length} présents dans la garde</p>
+                  <h2 className={clsx('font-display text-[21px] leading-none font-semibold tracking-tight', dispo === 0 ? 'text-white' : m.text)}>{m.label}</h2>
+                  <p className={clsx('mt-1 text-[12.5px]', dispo === 0 ? 'text-white/85' : 'text-muted')}>{d.specialiteTotal[sp].length} présents dans la garde</p>
                 </div>
                 <p className="ml-auto text-right leading-none">
-                  <span className={clsx('block font-display text-[40px] font-bold tabular-nums', dispo === 0 ? 'text-white' : dispo === 1 ? 'text-amber-600' : 'text-ok')}>{dispo}</span>
-                  <span className={clsx('text-[11px] font-semibold uppercase', dispo === 0 ? 'text-white' : 'text-slate-500')}>disponible{dispo > 1 ? 's' : ''}</span>
+                  <span className={clsx('block font-display text-[40px] font-semibold tabular-nums', dispo === 0 ? 'text-white' : dispo === 1 ? 'text-amber-600' : 'text-ok')}>{dispo}</span>
+                  <span className={clsx('text-[11px] font-semibold uppercase', dispo === 0 ? 'text-white' : 'text-muted')}>disponible{dispo > 1 ? 's' : ''}</span>
                 </p>
               </header>
               <ul className="divide-y divide-line/70">
@@ -44,11 +44,11 @@ export function Specialites() {
                   const meta = PERSON_STATUS_META[st.kind]
                   return (
                     <li key={p.id}>
-                      <button type="button" onClick={() => openSheet(p.id)} className={clsx('flex w-full items-center gap-2.5 px-4 py-2 text-left hover:bg-slate-50', st.kind === 'ABSENT' && 'opacity-55')}>
+                      <button type="button" onClick={() => openSheet(p.id)} className={clsx('flex w-full items-center gap-2.5 px-4 py-2 text-left hover:bg-ink/[0.03]', st.kind === 'ABSENT' && 'opacity-55')}>
                         <Avatar person={p} />
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[13.5px] font-semibold text-slate-800">{personName(p)}</span>
-                          <span className="block truncate text-[12px] text-slate-500">{statusLine(p, st)}</span>
+                          <span className="block truncate text-[13.5px] font-semibold text-ink">{personName(p)}</span>
+                          <span className="block truncate text-[12px] text-muted">{statusLine(p, st)}</span>
                         </span>
                         <span className={clsx('flex items-center gap-1.5 text-[12px] font-semibold', meta.text)}>
                           <span className={clsx('size-2 rounded-full', meta.dot)} />{meta.label}

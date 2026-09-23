@@ -31,8 +31,8 @@ export function Vehicules() {
       {SECTIONS.map((sec) => {
         const M = SECTION_META[sec]
         return (
-          <section key={sec} className="overflow-hidden rounded-xl border border-line bg-white">
-            <h2 className="flex items-center gap-2 border-b border-line bg-slate-50 px-4 py-2.5 font-display text-[18px] font-bold tracking-wide text-ink uppercase">
+          <section key={sec} className="overflow-hidden rounded-xl border border-line bg-paper">
+            <h2 className="flex items-center gap-2 border-b border-line bg-ink/[0.03] px-4 py-2.5 font-display text-[18px] font-semibold tracking-tight text-ink">
               <span className={clsx('grid size-6 place-items-center rounded-full text-white', M.tone)}><M.icon className="size-3.5" /></span>
               {M.title}
             </h2>
@@ -45,16 +45,16 @@ export function Vehicules() {
                     <span className={clsx('h-9 w-1 shrink-0 rounded', STATE_META[st.state].bar)} />
                     <button type="button" onClick={() => { navigate('/'); setTimeout(() => flash(v.id), 60) }} className="w-52 text-left">
                       <span className="block text-[14px] font-semibold text-ink hover:underline">{v.nom}</span>
-                      <span className="block text-[11.5px] text-slate-500">{v.groupe ?? ''}</span>
+                      <span className="block text-[11.5px] text-muted">{v.groupe ?? ''}</span>
                     </button>
                     <span className="flex w-44 items-center gap-2">
                       <StatePill state={st.state} since={st.since} size="sm" />
                       {st.state === 'EN_MISSION' && st.since && <span className="text-[11.5px] text-mission">{fmtDuration(st.since, now)}</span>}
                     </span>
                     <span className="w-24">{v.specialite && <SpecBadge sp={v.specialite} />}</span>
-                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-slate-600">
-                      <b className={clsx('mr-2 tabular-nums', crew.length < v.posts.length ? 'text-reserve' : 'text-slate-500')}>{crew.length}/{v.posts.length}</b>
-                      {crew.map((pid) => personName(d.personById[pid])).join(' · ') || <span className="text-slate-400">Aucun équipage</span>}
+                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-muted">
+                      <b className={clsx('mr-2 tabular-nums', crew.length < v.posts.length ? 'text-reserve' : 'text-muted')}>{crew.length}/{v.posts.length}</b>
+                      {crew.map((pid) => personName(d.personById[pid])).join(' · ') || <span className="text-ink/45">Aucun équipage</span>}
                     </span>
                     <span className="flex w-52 items-center gap-1">
                       <MainAction vehicles={[v]} size="sm" />

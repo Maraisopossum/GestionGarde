@@ -27,7 +27,7 @@ export function Board() {
         <SimpleSection id="ambulances" />
         <SimpleSection id="techniques" min={190} />
         <CoordinationSection />
-        <p className="pb-2 text-center text-[11.5px] text-slate-400">
+        <p className="pb-2 text-center text-[11.5px] text-ink/45">
           Glisser une personne sur un poste pour l’affecter · déposer sur un poste occupé pour permuter · clic sur un poste pour les actions rapides
         </p>
       </div>
@@ -43,11 +43,11 @@ export function Board() {
             <button
               type="button"
               onClick={() => setDrawer(true)}
-              className="fixed right-5 bottom-5 z-20 flex h-12 items-center gap-2 rounded-full bg-ink pr-4 pl-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_rgb(15_29_51/0.35)]"
+              className="fixed right-5 bottom-5 z-20 flex h-12 items-center gap-2 rounded-full bg-ink pr-4 pl-3 text-[14px] font-semibold text-paper shadow-inset active:opacity-80 shadow-[0_8px_24px_rgb(15_29_51/0.35)]"
             >
               <UserCheck className="size-5 text-ok-dot" />
               Personnel disponible
-              <span className="rounded-full bg-ok px-2 py-0.5 text-[12px] font-bold tabular-nums">{d.disponibles.length}</span>
+              <span className="rounded-full bg-ok px-2 py-0.5 text-[12px] font-semibold tabular-nums">{d.disponibles.length}</span>
             </button>
           )}
           {drawerOpen && (

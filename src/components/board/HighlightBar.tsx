@@ -22,8 +22,8 @@ export function HighlightBar() {
   const free = matches.length - onPost
 
   return (
-    <div className={clsx('flex flex-wrap items-center gap-1.5 rounded-xl border px-2.5 py-2', cap ? 'border-slate-300 bg-white shadow-sm' : 'border-line/80 bg-white/60')}>
-      <span className="mr-1 flex items-center gap-1.5 text-[11.5px] font-bold tracking-wider text-slate-500 uppercase">
+    <div className={clsx('flex flex-wrap items-center gap-1.5 rounded-xl border px-2.5 py-2', cap ? 'border-ink/25 bg-paper shadow-sm' : 'border-line bg-paper/60')}>
+      <span className="mr-1 flex items-center gap-1.5 text-[11.5px] font-semibold tracking-wider text-muted uppercase">
         <Crosshair className="size-4" /> Repérer
       </span>
       {CAPS.map((c) => {
@@ -36,7 +36,7 @@ export function HighlightBar() {
             aria-pressed={on}
             onClick={() => setCapFilter(on ? null : c)}
             className={clsx(
-              'h-7 rounded-full px-2.5 text-[11px] font-bold tracking-wide uppercase transition-colors',
+              'h-7 rounded-full px-2.5 text-[11px] font-semibold tracking-wide uppercase transition-colors',
               on ? clsx(m.solid, 'text-white shadow-sm') : clsx(m.soft, m.text, 'hover:brightness-95'),
             )}
           >
@@ -46,11 +46,11 @@ export function HighlightBar() {
       })}
       {cap && (
         <>
-          <span className="ml-1 text-[12.5px] text-slate-600">
+          <span className="ml-1 text-[12.5px] text-muted">
             <b className={clsx('tabular-nums', matches.length ? CAP_META[cap].text : 'text-mission')}>{matches.length}</b> disponible{matches.length > 1 ? 's' : ''}
-            {matches.length > 0 && <span className="text-slate-400"> · {onPost} sur un poste{free > 0 && `, ${free} sans poste`}</span>}
+            {matches.length > 0 && <span className="text-ink/45"> · {onPost} sur un poste{free > 0 && `, ${free} sans poste`}</span>}
           </span>
-          <button type="button" onClick={() => setCapFilter(null)} className="ml-auto flex h-7 items-center gap-1 rounded-md px-2 text-[12px] font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+          <button type="button" onClick={() => setCapFilter(null)} className="ml-auto flex h-7 items-center gap-1 rounded-md px-2 text-[12px] font-semibold text-muted hover:bg-ink/[0.05] hover:text-ink">
             <X className="size-3.5" /> Effacer
           </button>
         </>

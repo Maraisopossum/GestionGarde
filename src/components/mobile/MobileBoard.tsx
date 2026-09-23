@@ -31,7 +31,7 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
     <div
       id={`veh-${vehicle.id}`}
       className={clsx(
-        'overflow-hidden rounded-xl border bg-white transition-opacity',
+        'overflow-hidden rounded-xl border bg-paper transition-opacity',
         out ? 'border-mission/35' : 'border-line',
         flash && 'ring-4 ring-sky-400/60',
         hit && clsx('ring-2', CAP_META[cap!].ring),
@@ -41,8 +41,8 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={expanded} className="flex w-full items-stretch gap-3 py-2.5 pr-3 pl-0 text-left">
         <span className={clsx('w-1.5 shrink-0 rounded-r', STATE_META[status.state].bar)} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate font-display text-[17px] leading-tight font-bold tracking-wide text-ink uppercase">{title}</span>
-          <span className="mt-0.5 flex items-center gap-1.5 text-[12px] text-slate-500">
+          <span className="block truncate font-display text-[17px] leading-tight font-semibold tracking-tight text-ink">{title}</span>
+          <span className="mt-0.5 flex items-center gap-1.5 text-[12px] text-muted">
             <span className={clsx('font-semibold tabular-nums', crew.length < vehicle.posts.length && 'text-reserve')}>
               {crew.length}/{vehicle.posts.length}
             </span>
@@ -52,7 +52,7 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
         </span>
         <span className="flex items-center gap-2">
           <StatePill state={status.state} since={status.since} size="sm" />
-          <ChevronDown className={clsx('size-5 text-slate-400 transition-transform', expanded && 'rotate-180')} />
+          <ChevronDown className={clsx('size-5 text-ink/45 transition-transform', expanded && 'rotate-180')} />
         </span>
       </button>
       {expanded && (
@@ -80,20 +80,20 @@ function MobileSection({ id, collapsible = false }: { id: SectionId; collapsible
     <section>
       <button type="button" onClick={() => collapsible && setOpen((o) => !o)} className="mb-2 flex w-full items-center gap-2 px-1">
         <span className={clsx('grid size-7 place-items-center rounded-full text-white', m.tone)}><Icon className="size-4" /></span>
-        <h2 className="font-display text-[19px] font-bold tracking-wide text-ink uppercase">{m.title}</h2>
+        <h2 className="font-display text-[19px] font-semibold tracking-tight text-ink">{m.title}</h2>
         {id !== 'coordination' && (
-          <span className="ml-auto text-[12px] text-slate-500">
+          <span className="ml-auto text-[12px] text-muted">
             <b className="text-ok">{dispo}</b> dispo{outN > 0 && <> · <b className="text-mission">{outN}</b> sortis</>}
           </span>
         )}
-        {collapsible && <ChevronDown className={clsx('ml-auto size-5 text-slate-400', open && 'rotate-180')} />}
+        {collapsible && <ChevronDown className={clsx('ml-auto size-5 text-ink/45', open && 'rotate-180')} />}
       </button>
       {open && (
         id === 'coordination' ? (
-          <div className="space-y-1.5 rounded-xl border border-line bg-white p-3">
+          <div className="space-y-1.5 rounded-xl border border-line bg-paper p-3">
             {list.map((v) => (
               <div key={v.id} className="grid grid-cols-[104px_1fr] items-center gap-2">
-                <span className="truncate text-[11.5px] font-bold text-slate-600 uppercase">{v.nom}</span>
+                <span className="truncate text-[11.5px] font-semibold text-muted uppercase">{v.nom}</span>
                 <PostSlot post={v.posts[0]} locked={false} label={false} />
               </div>
             ))}

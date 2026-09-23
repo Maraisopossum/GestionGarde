@@ -65,9 +65,9 @@ export function Personnel() {
   }
 
   const Th = ({ k, children, className }: { k?: SortKey; children: ReactNode; className?: string }) => (
-    <th className={clsx('px-3 py-2.5 text-left text-[11px] font-bold tracking-wider text-slate-500 uppercase', className)}>
+    <th className={clsx('px-3 py-2.5 text-left text-[11px] font-semibold tracking-wider text-muted uppercase', className)}>
       {k ? (
-        <button type="button" onClick={() => setSort((s) => ({ key: k, asc: s.key === k ? !s.asc : true }))} className="inline-flex items-center gap-1 hover:text-slate-800">
+        <button type="button" onClick={() => setSort((s) => ({ key: k, asc: s.key === k ? !s.asc : true }))} className="inline-flex items-center gap-1 hover:text-ink">
           {children}
           {sort.key === k && (sort.asc ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
         </button>
@@ -79,12 +79,12 @@ export function Personnel() {
     <Page title="Personnel" subtitle={`${counts.TOUS} personnes dans la garde · ${d.disponibles.length} disponibles · ${d.enMission.length} en mission`}>
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-slate-400" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher…" className="h-9 w-full rounded-md border border-line bg-white pl-8 text-sm outline-none focus:border-sky-500" />
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-ink/45" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Rechercher…" className="h-9 w-full rounded-md border border-line bg-paper pl-8 text-sm outline-none focus:border-sky-500" />
         </div>
         <div className="flex flex-wrap gap-1.5">
           {FILTERS.map((f) => (
-            <button key={f.id} type="button" onClick={() => setFilter(f.id)} className={clsx('h-9 rounded-md border px-3 text-[12.5px] font-semibold', filter === f.id ? 'border-ink bg-ink text-white' : 'border-line bg-white text-slate-600 hover:bg-slate-50')}>
+            <button key={f.id} type="button" onClick={() => setFilter(f.id)} className={clsx('h-9 rounded-md border px-3 text-[12.5px] font-semibold', filter === f.id ? 'border-ink bg-ink text-paper shadow-inset' : 'border-line bg-paper text-muted hover:bg-ink/[0.03]')}>
               {f.label} <span className="opacity-60 tabular-nums">{counts[f.id]}</span>
             </button>
           ))}
@@ -92,14 +92,14 @@ export function Personnel() {
       </div>
 
       {mobile ? (
-        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper">
           {rows.map((p) => (
             <li key={p.id}>
               <button type="button" onClick={() => openSheet(p.id)} className="flex w-full items-center gap-3 px-3 py-2.5 text-left">
                 <Avatar person={p} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[14px] font-semibold">{personName(p)} <span className="font-normal text-slate-400">{p.prenom}</span></span>
-                  <span className="block truncate text-[12px] text-slate-500">{statusLine(p, d.status[p.id])}</span>
+                  <span className="block truncate text-[14px] font-semibold">{personName(p)} <span className="font-normal text-ink/45">{p.prenom}</span></span>
+                  <span className="block truncate text-[12px] text-muted">{statusLine(p, d.status[p.id])}</span>
                 </span>
                 <SpecBadges specs={p.specialites} variant="icon" />
                 <span className={clsx('size-2.5 shrink-0 rounded-full', PERSON_STATUS_META[d.status[p.id].kind].dot)} />
@@ -108,9 +108,9 @@ export function Personnel() {
           ))}
         </ul>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-line bg-white">
+        <div className="overflow-x-auto rounded-xl border border-line bg-paper">
           <table className="w-full min-w-[860px] border-collapse">
-            <thead className="border-b border-line bg-slate-50">
+            <thead className="border-b border-line bg-ink/[0.03]">
               <tr>
                 <Th k="nom">Nom</Th>
                 <Th k="grade">Grade</Th>
@@ -125,24 +125,24 @@ export function Personnel() {
               {rows.map((p) => {
                 const st = d.status[p.id]
                 return (
-                  <tr key={p.id} onClick={() => openSheet(p.id)} className={clsx('cursor-pointer border-b border-line/70 last:border-0 hover:bg-sky-50/50', st.kind === 'ABSENT' && 'text-slate-400')}>
+                  <tr key={p.id} onClick={() => openSheet(p.id)} className={clsx('cursor-pointer border-b border-line/70 last:border-0 hover:bg-sky-50/50', st.kind === 'ABSENT' && 'text-ink/45')}>
                     <td className="px-3 py-2">
                       <span className="flex items-center gap-2.5">
                         <Avatar person={p} />
-                        <span className="text-[13.5px] font-semibold text-slate-800">{p.nom}</span>
-                        <span className="text-[12.5px] text-slate-400">{p.prenom}</span>
+                        <span className="text-[13.5px] font-semibold text-ink">{p.nom}</span>
+                        <span className="text-[12.5px] text-ink/45">{p.prenom}</span>
                       </span>
                     </td>
                     <td className="px-3 py-2 text-[13px]">{p.grade}</td>
                     <td className="px-3 py-2"><StatusCell kind={st.kind} /></td>
-                    <td className="max-w-[260px] truncate px-3 py-2 text-[12.5px] text-slate-600">{statusLine(p, st)}</td>
+                    <td className="max-w-[260px] truncate px-3 py-2 text-[12.5px] text-muted">{statusLine(p, st)}</td>
                     {SPECIALITES.map((s) => (
                       <td key={s} className="px-3 py-2 text-center">
                         {p.specialites.includes(s) && (() => { const I = SPEC_META[s].icon; return <span className={clsx('inline-grid size-6 place-items-center rounded', SPEC_META[s].soft, SPEC_META[s].text)}><I className="size-3.5" strokeWidth={2.5} /></span> })()}
                       </td>
                     ))}
-                    <td className="px-3 py-2 text-center">{p.fonctions.includes('CHEF') && <Check className="inline size-4 text-slate-600" />}</td>
-                    <td className="px-3 py-2 text-center">{p.fonctions.includes('CHAUFFEUR') && <Check className="inline size-4 text-slate-600" />}</td>
+                    <td className="px-3 py-2 text-center">{p.fonctions.includes('CHEF') && <Check className="inline size-4 text-muted" />}</td>
+                    <td className="px-3 py-2 text-center">{p.fonctions.includes('CHAUFFEUR') && <Check className="inline size-4 text-muted" />}</td>
                   </tr>
                 )
               })}

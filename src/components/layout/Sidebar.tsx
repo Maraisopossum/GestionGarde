@@ -19,15 +19,15 @@ function Item({ to, label, icon: Icon, collapsed, badge }: { to: string; label: 
       end={to === '/'}
       title={collapsed ? label : undefined}
       className={({ isActive }) => clsx(
-        'relative flex h-11 items-center gap-3 rounded-lg text-[14px] font-medium transition-colors',
+        'relative flex h-10 items-center gap-3 rounded-md text-[14px] transition-colors',
         collapsed ? 'justify-center' : 'px-3',
-        isActive ? 'bg-white/[0.12] text-white before:absolute before:top-2 before:bottom-2 before:-left-3 before:w-1 before:rounded-r before:bg-sky-400' : 'text-white/65 hover:bg-white/[0.06] hover:text-white',
+        isActive ? 'bg-ink/[0.06] font-semibold text-ink' : 'text-ink/60 hover:bg-ink/[0.04] hover:text-ink',
       )}
     >
       <Icon className="size-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
       {!!badge && (
-        <span className={clsx('grid h-5 min-w-5 place-items-center rounded-full bg-mission px-1 text-[11px] font-bold text-white', collapsed ? 'absolute top-1 right-1' : 'ml-auto')}>{badge}</span>
+        <span className={clsx('grid h-5 min-w-5 place-items-center rounded-full bg-mission px-1 text-[11px] font-semibold text-white', collapsed ? 'absolute top-1 right-1' : 'ml-auto')}>{badge}</span>
       )}
     </NavLink>
   )
@@ -37,15 +37,15 @@ export function Sidebar({ collapsed }: { collapsed: boolean }) {
   const { vehiclesOut } = useDerived()
   const missions = new Set(vehiclesOut.map((v) => v.groupe ?? v.id)).size
   return (
-    <aside className={clsx('flex h-full shrink-0 flex-col bg-ink-2 px-3 py-4 text-white', collapsed ? 'w-[68px]' : 'w-[228px]')}>
+    <aside className={clsx('flex h-full shrink-0 flex-col border-r border-line bg-canvas px-3 py-4 text-ink', collapsed ? 'w-[68px]' : 'w-[228px]')}>
       <div className={clsx('mb-6 flex items-center gap-2.5', collapsed && 'justify-center')}>
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-red-600">
-          <Flame className="size-6 text-amber-100" strokeWidth={2.25} />
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-ink shadow-inset">
+          <Flame className="size-5 text-red-400" strokeWidth={2.25} />
         </span>
         {!collapsed && (
           <span className="leading-tight">
-            <span className="block font-display text-[19px] font-bold tracking-wide">GESTION GARDE</span>
-            <span className="block text-[11px] text-white/50">Maquette · données fictives</span>
+            <span className="block font-display text-[17px] font-semibold tracking-tight">Gestion garde</span>
+            <span className="block text-[11.5px] text-muted">Maquette · données fictives</span>
           </span>
         )}
       </div>

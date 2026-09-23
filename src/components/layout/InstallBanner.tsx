@@ -49,19 +49,19 @@ export function InstallBanner() {
   if (installed || hidden || (!canPrompt && !ios)) return null
   const close = () => { write(); setHidden(true) }
   return (
-    <div className="mx-3 mt-3 flex items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2.5">
+    <div className="mx-3 mt-3 flex items-center gap-3 rounded-xl border border-line bg-paper px-3 py-2.5">
       <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-ink text-white">
         {ios ? <Share className="size-4" /> : <Download className="size-4" />}
       </span>
-      <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-slate-700">
+      <p className="min-w-0 flex-1 text-[12.5px] leading-snug text-ink/85">
         <b className="text-ink">Installer l’application</b>
         <br />
         {ios ? <>Touchez <Share className="inline size-3.5 align-[-2px]" /> puis « Sur l’écran d’accueil ».</> : 'Accès plein écran, même hors connexion.'}
       </p>
       {canPrompt && (
-        <button type="button" onClick={prompt} className="h-8 rounded-md bg-ink px-3 text-[12px] font-bold text-white">Installer</button>
+        <button type="button" onClick={prompt} className="h-8 rounded-md bg-ink px-3 text-[12px] font-semibold text-paper shadow-inset active:opacity-80">Installer</button>
       )}
-      <button type="button" onClick={close} aria-label="Masquer" className="grid size-7 place-items-center rounded text-slate-400">
+      <button type="button" onClick={close} aria-label="Masquer" className="grid size-7 place-items-center rounded text-ink/45">
         <X className="size-4" />
       </button>
     </div>

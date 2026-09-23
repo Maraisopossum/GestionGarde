@@ -23,8 +23,8 @@ function Explanation({ person }: { person: Person }) {
     const v = VEHICLE_BY_ID[st.missionVehicleId!]
     return (
       <div className="rounded-lg border border-mission/25 bg-mission-soft px-3 py-2.5">
-        <p className="flex items-center gap-2 font-display text-[18px] font-bold tracking-wide text-mission uppercase"><Siren className="size-5" /> En mission</p>
-        <p className="mt-0.5 text-[13px] text-slate-700">
+        <p className="flex items-center gap-2 font-display text-[18px] font-semibold tracking-tight text-mission"><Siren className="size-5" /> En mission</p>
+        <p className="mt-0.5 text-[13px] text-ink/85">
           Sur <b>{v.nom}</b> depuis {fmtTime(st.since)} ({fmtDuration(st.since!, now)}). Indisponible jusqu’au retour du véhicule.
         </p>
       </div>
@@ -32,15 +32,15 @@ function Explanation({ person }: { person: Person }) {
   }
   if (st.kind === 'ABSENT')
     return (
-      <div className="rounded-lg border border-line bg-slate-50 px-3 py-2.5">
-        <p className="font-display text-[18px] font-bold tracking-wide text-slate-600 uppercase">Absent — {PRESENCE_LABEL[person.presence]}</p>
-        <p className="mt-0.5 text-[13px] text-slate-600">Non comptabilisé dans le personnel disponible ni dans les spécialistes.</p>
+      <div className="rounded-lg border border-line bg-ink/[0.03] px-3 py-2.5">
+        <p className="font-display text-[18px] font-semibold tracking-tight text-muted">Absent — {PRESENCE_LABEL[person.presence]}</p>
+        <p className="mt-0.5 text-[13px] text-muted">Non comptabilisé dans le personnel disponible ni dans les spécialistes.</p>
       </div>
     )
   return (
     <div className="rounded-lg border border-ok/25 bg-ok-soft px-3 py-2.5">
-      <p className="font-display text-[18px] font-bold tracking-wide text-ok uppercase">Disponible</p>
-      <p className="mt-0.5 text-[13px] text-slate-700">
+      <p className="font-display text-[18px] font-semibold tracking-tight text-ok">Disponible</p>
+      <p className="mt-0.5 text-[13px] text-ink/85">
         {st.kind === 'LIBRE' ? 'Présent à la caserne, sans poste attribué — peut être affecté immédiatement.' : 'Présent à la caserne, affecté à un véhicule disponible.'}
       </p>
     </div>
@@ -62,14 +62,14 @@ function PostChooser({ person }: { person: Person }) {
   return (
     <div className="rounded-lg border border-line">
       <button type="button" onClick={() => setOpen((o) => !o)} className="flex h-10 w-full items-center gap-2 px-3 text-[13px] font-semibold text-ink">
-        Affecter à un poste libre <span className="text-slate-400">({free.filter((f) => f.ok).length} compatibles)</span>
+        Affecter à un poste libre <span className="text-ink/45">({free.filter((f) => f.ok).length} compatibles)</span>
         <ChevronDown className={clsx('ml-auto size-4 transition-transform', open && 'rotate-180')} />
       </button>
       {open && (
         <ul className="scroll-thin max-h-64 overflow-y-auto border-t border-line py-1">
           {free.map(({ p, ok }) => (
             <li key={p.id}>
-              <button type="button" onClick={() => assign(person, p.id)} className={clsx('flex w-full items-center gap-2 px-3 py-1.5 text-left text-[13px] hover:bg-slate-50', !ok && 'text-slate-400')}>
+              <button type="button" onClick={() => assign(person, p.id)} className={clsx('flex w-full items-center gap-2 px-3 py-1.5 text-left text-[13px] hover:bg-ink/[0.03]', !ok && 'text-ink/45')}>
                 <span className="font-medium">{postLabel(p.id)}</span>
                 {!ok && <span className="ml-auto text-[11px] text-reserve">non qualifié</span>}
               </button>
@@ -107,11 +107,11 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
       <header className="flex items-start gap-3 border-b border-line p-4">
         <Avatar person={person} size="lg" />
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold tracking-wider text-slate-500 uppercase">{person.grade}</p>
-          <h2 className="truncate font-display text-[26px] leading-tight font-bold tracking-wide text-ink uppercase">{person.nom}</h2>
-          <p className="text-[13px] text-slate-600">{person.prenom}</p>
+          <p className="text-[12px] font-semibold tracking-wider text-muted uppercase">{person.grade}</p>
+          <h2 className="truncate font-display text-[26px] leading-tight font-semibold tracking-tight text-ink">{person.nom}</h2>
+          <p className="text-[13px] text-muted">{person.prenom}</p>
         </div>
-        <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-9 place-items-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+        <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-9 place-items-center rounded-md text-ink/45 hover:bg-ink/[0.05] hover:text-ink/85">
           <X className="size-5" />
         </button>
       </header>
@@ -120,8 +120,8 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
         <Explanation person={person} />
 
         <section>
-          <h3 className="mb-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">Affectation actuelle</h3>
-          {st.posts.length === 0 ? <p className="text-[13px] text-slate-500">Aucun poste.</p> : (
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Affectation actuelle</h3>
+          {st.posts.length === 0 ? <p className="text-[13px] text-muted">Aucun poste.</p> : (
             <ul className="space-y-1.5">
               {st.posts.map((pid) => {
                 const v = VEHICLE_BY_ID[vehicleIdOf(pid)]
@@ -130,10 +130,10 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
                   <li key={pid} className="flex items-center gap-2 rounded-md border border-line px-3 py-2">
                     <button type="button" onClick={() => { onClose(); flashVehicle(v.id) }} className="min-w-0 flex-1 text-left">
                       <span className="block text-[13.5px] font-semibold text-ink">{v.section === 'coordination' ? v.nom : POST_BY_ID[pid].label}</span>
-                      <span className="block text-[12px] text-slate-500">{v.section === 'coordination' ? 'Coordination' : v.nom}</span>
+                      <span className="block text-[12px] text-muted">{v.section === 'coordination' ? 'Coordination' : v.nom}</span>
                     </button>
                     {!locked && (
-                      <button type="button" onClick={() => unassign(pid)} className="flex h-8 items-center gap-1 rounded px-2 text-[12px] font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800">
+                      <button type="button" onClick={() => unassign(pid)} className="flex h-8 items-center gap-1 rounded px-2 text-[12px] font-medium text-muted hover:bg-ink/[0.05] hover:text-ink">
                         <UserMinus className="size-4" /> Retirer
                       </button>
                     )}
@@ -146,25 +146,25 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
         </section>
 
         <section>
-          <h3 className="mb-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">Spécialités</h3>
-          {person.specialites.length ? <div className="flex flex-wrap gap-1.5">{person.specialites.map((s) => <SpecBadge key={s} sp={s} className="h-6 text-[11.5px]" />)}</div> : <p className="text-[13px] text-slate-500">Aucune spécialité.</p>}
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Spécialités</h3>
+          {person.specialites.length ? <div className="flex flex-wrap gap-1.5">{person.specialites.map((s) => <SpecBadge key={s} sp={s} className="h-6 text-[11.5px]" />)}</div> : <p className="text-[13px] text-muted">Aucune spécialité.</p>}
         </section>
 
         <section>
-          <h3 className="mb-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">Fonctions possibles</h3>
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Fonctions possibles</h3>
           <div className="flex flex-wrap gap-1.5">
-            {roles.postes.map((r) => <span key={r} className="rounded bg-slate-100 px-2 py-1 text-[12px] font-semibold text-slate-700">{r}</span>)}
-            <span className="rounded px-1 py-1 text-[12px] text-slate-500">+ tous les postes sans qualification</span>
+            {roles.postes.map((r) => <span key={r} className="rounded bg-ink/[0.05] px-2 py-1 text-[12px] font-semibold text-ink/85">{r}</span>)}
+            <span className="rounded px-1 py-1 text-[12px] text-muted">+ tous les postes sans qualification</span>
           </div>
           {roles.coord.length > 0 && (
-            <p className="mt-2 text-[12px] leading-relaxed text-slate-500">
-              <span className="font-semibold text-slate-600">Coordination :</span> {roles.coord.join(' · ')}
+            <p className="mt-2 text-[12px] leading-relaxed text-muted">
+              <span className="font-semibold text-muted">Coordination :</span> {roles.coord.join(' · ')}
             </p>
           )}
         </section>
 
         <section>
-          <h3 className="mb-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">Présence</h3>
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Présence</h3>
           <div className="flex flex-wrap gap-1.5">
             {PRESENCES.map((p) => (
               <button
@@ -172,23 +172,23 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
                 type="button"
                 disabled={st.kind === 'EN_MISSION'}
                 onClick={() => setPresence(person.id, p)}
-                className={clsx('h-8 rounded-md border px-2.5 text-[12px] font-semibold disabled:opacity-40', person.presence === p ? 'border-ink bg-ink text-white' : 'border-line text-slate-600 hover:bg-slate-50')}
+                className={clsx('h-8 rounded-md border px-2.5 text-[12px] font-semibold disabled:opacity-40', person.presence === p ? 'border-ink bg-ink text-paper shadow-inset' : 'border-line text-muted hover:bg-ink/[0.03]')}
               >
                 {PRESENCE_LABEL[p]}
               </button>
             ))}
           </div>
-          {person.presence === 'PRESENT' && st.posts.length > 0 && st.kind !== 'EN_MISSION' && <p className="mt-1.5 text-[11.5px] text-slate-500">Marquer absent libère automatiquement ses postes.</p>}
+          {person.presence === 'PRESENT' && st.posts.length > 0 && st.kind !== 'EN_MISSION' && <p className="mt-1.5 text-[11.5px] text-muted">Marquer absent libère automatiquement ses postes.</p>}
         </section>
 
         <section>
-          <h3 className="mb-2 text-[11px] font-bold tracking-wider text-slate-500 uppercase">Historique récent</h3>
-          {mine.length === 0 ? <p className="text-[13px] text-slate-500">Aucun mouvement pendant cette garde.</p> : (
+          <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Historique récent</h3>
+          {mine.length === 0 ? <p className="text-[13px] text-muted">Aucun mouvement pendant cette garde.</p> : (
             <ol className="space-y-2 border-l-2 border-line pl-3">
               {mine.map((h) => (
                 <li key={h.id} className="text-[12.5px]">
-                  <span className="font-semibold text-slate-800 tabular-nums">{fmtTime(h.at)}</span>
-                  <span className="text-slate-600"> — {h.text}</span>
+                  <span className="font-semibold text-ink tabular-nums">{fmtTime(h.at)}</span>
+                  <span className="text-muted"> — {h.text}</span>
                 </li>
               ))}
             </ol>
@@ -220,7 +220,7 @@ export function PersonSheet() {
       <aside
         role="dialog"
         aria-label={`Fiche ${person.nom}`}
-        className={clsx('relative flex flex-col bg-white shadow-2xl', mobile ? 'up-in pt-safe pb-safe mt-auto h-[92vh] w-full rounded-t-2xl' : 'sheet-in h-full w-[420px]')}
+        className={clsx('relative flex flex-col bg-paper shadow-2xl', mobile ? 'up-in pt-safe pb-safe mt-auto h-[92vh] w-full rounded-t-2xl' : 'sheet-in h-full w-[420px]')}
       >
         <SheetBody person={person} onClose={close} />
       </aside>

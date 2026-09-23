@@ -35,7 +35,7 @@ export function SpecBadge({ sp, variant = 'label', className }: { sp: Specialite
       </span>
     )
   return (
-    <span className={clsx('inline-flex h-5 shrink-0 items-center gap-1 rounded px-1.5 text-[10.5px] font-bold tracking-wide uppercase', m.soft, m.text, className)}>
+    <span className={clsx('inline-flex h-5 shrink-0 items-center gap-1 rounded px-1.5 text-[10.5px] font-semibold tracking-wide uppercase', m.soft, m.text, className)}>
       <Icon className="size-3" strokeWidth={2.5} />
       {m.label}
     </span>
@@ -50,7 +50,7 @@ export function SpecBadges({ specs, variant }: { specs: Specialite[]; variant?: 
 /* ----------------------------------------------------------------- Grade */
 
 const GRADE_TONE: Record<Person['grade'], string> = {
-  SP: 'bg-slate-600 text-white',
+  SP: 'bg-ink/70 text-white',
   Cpl: 'bg-sky-800 text-white',
   Sgt: 'bg-orange-600 text-white',
   'Sgt Maj': 'bg-orange-700 text-white',
@@ -61,7 +61,7 @@ export function Avatar({ person, size = 'sm', className }: { person: Person; siz
   return (
     <span
       className={clsx(
-        'inline-grid shrink-0 place-items-center rounded-full font-bold tracking-tight',
+        'inline-grid shrink-0 place-items-center rounded-full font-semibold tracking-tight',
         GRADE_TONE[person.grade],
         size === 'xs' && 'size-5 text-[8.5px]',
         size === 'sm' && 'size-6 text-[9.5px]',
@@ -89,7 +89,7 @@ export function StatePill({ state, since, size = 'md' }: { state: VehicleState; 
   return (
     <span
       className={clsx(
-        'inline-flex items-center gap-1.5 rounded font-bold tracking-wide uppercase',
+        'inline-flex items-center gap-1.5 rounded font-semibold tracking-wide uppercase',
         m.pill,
         size === 'md' ? 'h-6 px-2 text-[11px]' : 'h-5 px-1.5 text-[10px]',
       )}
@@ -107,12 +107,12 @@ export const PERSON_STATUS_META: Record<PersonStatusKind, { label: string; dot: 
   LIBRE: { label: 'Disponible', dot: 'bg-ok-dot', text: 'text-ok' },
   AFFECTE: { label: 'Disponible', dot: 'bg-ok-dot', text: 'text-ok' },
   EN_MISSION: { label: 'En mission', dot: 'bg-mission', text: 'text-mission' },
-  ABSENT: { label: 'Absent', dot: 'bg-slate-400', text: 'text-slate-500' },
+  ABSENT: { label: 'Absent', dot: 'bg-ink/30', text: 'text-muted' },
 }
 
 export function MissionTag({ className }: { className?: string }) {
   return (
-    <span className={clsx('inline-flex h-[18px] shrink-0 items-center rounded-sm bg-mission-soft px-1 text-[9.5px] font-bold tracking-wide text-mission uppercase', className)}>
+    <span className={clsx('inline-flex h-[18px] shrink-0 items-center rounded-sm bg-mission-soft px-1 text-[9.5px] font-semibold tracking-wide text-mission uppercase', className)}>
       En mission
     </span>
   )

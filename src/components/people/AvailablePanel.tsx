@@ -75,7 +75,7 @@ function PersonRow({ person }: { person: Person }) {
         {...listeners}
         onClick={() => openSheet(person.id)}
         className={clsx(
-          'group flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-sky-500 touch-manipulation',
+          'group flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left outline-none hover:bg-ink/[0.03] focus-visible:ring-2 focus-visible:ring-sky-500 touch-manipulation',
           isDragging && 'opacity-30',
           movable && 'cursor-grab active:cursor-grabbing',
           st.kind === 'ABSENT' && 'opacity-60',
@@ -84,19 +84,19 @@ function PersonRow({ person }: { person: Person }) {
         <Avatar person={person} />
         <span className="min-w-0 flex-1">
           <span className="flex items-baseline gap-1.5">
-            <span className="truncate text-[13px] font-semibold text-slate-800">{personName(person)}</span>
-            <span className="truncate text-[11.5px] text-slate-400">{person.prenom}</span>
+            <span className="truncate text-[13px] font-semibold text-ink">{personName(person)}</span>
+            <span className="truncate text-[11.5px] text-ink/45">{person.prenom}</span>
           </span>
           <span className="flex items-center gap-1.5 text-[11.5px]">
             <span className={clsx('size-1.5 shrink-0 rounded-full', meta.dot)} />
-            <span className={clsx('truncate', st.kind === 'LIBRE' ? 'font-medium text-ok' : st.kind === 'EN_MISSION' ? 'text-mission' : 'text-slate-500')}>
+            <span className={clsx('truncate', st.kind === 'LIBRE' ? 'font-medium text-ok' : st.kind === 'EN_MISSION' ? 'text-mission' : 'text-muted')}>
               {statusLine(person, st)}
             </span>
           </span>
         </span>
         {st.kind === 'EN_MISSION' && <MissionTag />}
         <SpecBadges specs={person.specialites} />
-        {movable && <GripVertical className="size-4 shrink-0 text-slate-300 opacity-0 group-hover:opacity-100" />}
+        {movable && <GripVertical className="size-4 shrink-0 text-ink/30 opacity-0 group-hover:opacity-100" />}
       </button>
     </li>
   )
@@ -111,14 +111,14 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
   const { setNodeRef, isOver } = useDroppable({ id: 'panel', data: { panel: true } })
 
   return (
-    <section ref={setNodeRef} aria-label="Personnel disponible" className={clsx('relative flex min-h-0 flex-col rounded-xl border border-line bg-white', className)}>
+    <section ref={setNodeRef} aria-label="Personnel disponible" className={clsx('relative flex min-h-0 flex-col rounded-xl border border-line bg-paper', className)}>
       <header className="flex items-center gap-2 px-3 pt-3 pb-2">
-        <h2 className="font-display text-[19px] font-bold tracking-wide text-ink uppercase">Personnel disponible</h2>
-        <p className="ml-auto font-display text-[22px] leading-none font-bold text-ok tabular-nums">
-          {d.disponibles.length}<span className="text-[15px] text-slate-400"> / {d.presents.length}</span>
+        <h2 className="font-display text-[19px] font-semibold tracking-tight text-ink">Personnel disponible</h2>
+        <p className="ml-auto font-display text-[22px] leading-none font-semibold text-ok tabular-nums">
+          {d.disponibles.length}<span className="text-[15px] text-ink/45"> / {d.presents.length}</span>
         </p>
         {onClose && (
-          <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-8 place-items-center rounded text-slate-400 hover:bg-slate-100">
+          <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-8 place-items-center rounded text-ink/45 hover:bg-ink/[0.05]">
             <X className="size-5" />
           </button>
         )}
@@ -126,26 +126,26 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
 
       <div className="space-y-2 px-3 pb-2">
         <div className="relative">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-ink/45" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher un personnel…"
-            className="h-9 w-full rounded-md border border-line bg-slate-50 pr-8 pl-8 text-sm outline-none focus:border-sky-500 focus:bg-white"
+            className="h-9 w-full rounded-md border border-line bg-ink/[0.03] pr-8 pl-8 text-sm outline-none focus:border-sky-500 focus:bg-paper"
           />
           {search && (
-            <button type="button" onClick={() => setSearch('')} aria-label="Effacer" className="absolute top-1/2 right-1.5 grid size-6 -translate-y-1/2 place-items-center rounded text-slate-400 hover:text-slate-700">
+            <button type="button" onClick={() => setSearch('')} aria-label="Effacer" className="absolute top-1/2 right-1.5 grid size-6 -translate-y-1/2 place-items-center rounded text-ink/45 hover:text-ink/85">
               <X className="size-3.5" />
             </button>
           )}
         </div>
-        <div className="grid grid-cols-4 rounded-md bg-slate-100 p-0.5">
+        <div className="grid grid-cols-4 rounded-md bg-ink/[0.05] p-0.5">
           {STATUS_TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setStatusFilter(t.id)}
-              className={clsx('h-7 rounded text-[11.5px] font-semibold', statusFilter === t.id ? 'bg-white text-ink shadow-sm' : 'text-slate-500 hover:text-slate-800')}
+              className={clsx('h-7 rounded text-[11.5px] font-semibold', statusFilter === t.id ? 'bg-paper text-ink shadow-sm' : 'text-muted hover:text-ink')}
             >
               {t.label}
             </button>
@@ -161,8 +161,8 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
                 onClick={() => setCapFilter(on ? null : c.id)}
                 aria-pressed={on}
                 className={clsx(
-                  'h-7 rounded-full border px-2.5 text-[11px] font-bold tracking-wide uppercase transition-colors',
-                  on ? clsx('border-transparent text-white shadow-sm', CAP_META[c.id].solid) : clsx('border-transparent', CAP_META[c.id].soft, CAP_META[c.id].text, 'hover:border-slate-300'),
+                  'h-7 rounded-full border px-2.5 text-[11px] font-semibold tracking-wide uppercase transition-colors',
+                  on ? clsx('border-transparent text-white shadow-sm', CAP_META[c.id].solid) : clsx('border-transparent', CAP_META[c.id].soft, CAP_META[c.id].text, 'hover:border-ink/25'),
                 )}
               >
                 {c.label}
@@ -173,16 +173,16 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
       </div>
 
       <ul className="scroll-thin min-h-0 flex-1 overflow-y-auto border-t border-line px-1.5 py-1.5">
-        {list.length === 0 && <li className="px-3 py-8 text-center text-sm text-slate-500">Aucun résultat pour ces filtres</li>}
+        {list.length === 0 && <li className="px-3 py-8 text-center text-sm text-muted">Aucun résultat pour ces filtres</li>}
         {list.map((p) => <PersonRow key={p.id} person={p} />)}
       </ul>
 
       {fromPost && (
         <div className={clsx(
           'pointer-events-none absolute inset-0 grid place-items-center rounded-xl border-2 border-dashed backdrop-blur-[1px] transition-colors',
-          isOver ? 'border-reserve bg-reserve-soft/90' : 'border-slate-300 bg-white/80',
+          isOver ? 'border-reserve bg-reserve-soft/90' : 'border-ink/25 bg-paper/85',
         )}>
-          <p className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <p className="flex items-center gap-2 text-sm font-semibold text-ink/85">
             <UserMinus className="size-5" /> Déposer ici pour retirer du poste
           </p>
         </div>

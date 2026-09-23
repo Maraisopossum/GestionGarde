@@ -10,7 +10,7 @@ import { useUI } from '../../store/useUI'
 const LEVEL = {
   danger: { icon: CircleAlert, cls: 'border-mission/30 bg-mission-soft text-mission', title: 'text-red-800' },
   warning: { icon: TriangleAlert, cls: 'border-amber-300/70 bg-amber-50 text-amber-600', title: 'text-amber-900' },
-  info: { icon: Info, cls: 'border-line bg-white text-slate-500', title: 'text-slate-700' },
+  info: { icon: Info, cls: 'border-line bg-paper text-muted', title: 'text-ink/85' },
 }
 
 /** Alertes opérationnelles : visibles, compactes, jamais bloquantes. */
@@ -47,13 +47,13 @@ export function AlertBar() {
             <Icon className="size-4 shrink-0" strokeWidth={2.5} />
             <span className="min-w-0 text-[12.5px] leading-tight">
               <b className={clsx('font-semibold', L.title)}>{a.title}</b>
-              {a.detail && <span className="text-slate-500"> · {a.detail}</span>}
+              {a.detail && <span className="text-muted"> · {a.detail}</span>}
             </span>
           </button>
         )
       })}
       {alerts.length > max && (
-        <button type="button" onClick={() => setExpanded((e) => !e)} className="flex h-8 items-center gap-1 rounded-lg px-2 text-[12px] font-semibold text-slate-600 hover:bg-white">
+        <button type="button" onClick={() => setExpanded((e) => !e)} className="flex h-8 items-center gap-1 rounded-lg px-2 text-[12px] font-semibold text-muted hover:bg-paper">
           {expanded ? 'Réduire' : `+ ${alerts.length - max} alerte${alerts.length - max > 1 ? 's' : ''}`}
           <ChevronDown className={clsx('size-4', expanded && 'rotate-180')} />
         </button>

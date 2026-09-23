@@ -15,7 +15,7 @@ export function PersonInline({ person, inMission, dense, strong }: { person: Per
   return (
     <span className="flex min-w-0 flex-1 items-center gap-1.5">
       <Avatar person={person} size="xs" />
-      <span className={clsx('truncate text-slate-800', strong ? 'font-bold text-ink' : 'font-medium', dense ? 'text-[12px]' : 'text-[12.5px]')}>{personName(person)}</span>
+      <span className={clsx('truncate text-ink', strong ? 'font-semibold text-ink' : 'font-medium', dense ? 'text-[12px]' : 'text-[12.5px]')}>{personName(person)}</span>
       <SpecBadges specs={person.specialites} variant="icon" />
       {inMission && <MissionTag className="ml-auto" />}
     </span>
@@ -57,7 +57,7 @@ export function PostSlot({ post, locked, label = true }: { post: Post; locked: b
   return (
     <div className={clsx(label && 'grid grid-cols-[42px_1fr] items-center gap-1.5')}>
       {label && (
-        <span className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase" title={req ? 'Poste qualifié' : undefined}>
+        <span className="text-[11px] font-semibold tracking-wide text-muted uppercase" title={req ? 'Poste qualifié' : undefined}>
           {post.label}
         </span>
       )}
@@ -82,7 +82,7 @@ export function PostSlot({ post, locked, label = true }: { post: Post; locked: b
             className={clsx(
               'flex h-8 w-full min-w-0 items-center rounded-md border px-1.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-sky-500',
               hl ? clsx('border-transparent ring-2 shadow-sm', CAP_META[cap!].soft, CAP_META[cap!].ring)
-                : inMission ? 'border-mission/20 bg-mission-soft/60' : 'border-line bg-white hover:border-slate-300 hover:bg-slate-50',
+                : inMission ? 'border-mission/20 bg-mission-soft/60' : 'border-line bg-paper hover:border-ink/25 hover:bg-ink/[0.03]',
               dim && 'opacity-35',
               !locked && !inMission && 'cursor-grab active:cursor-grabbing',
               isDragging && 'opacity-30',
@@ -99,7 +99,7 @@ export function PostSlot({ post, locked, label = true }: { post: Post; locked: b
             onClick={(e) => openPicker(post.id, e.currentTarget)}
             className={clsx(
               'group flex h-8 w-full items-center gap-1.5 rounded-md border border-dashed px-2 text-[10.5px] font-semibold tracking-wider uppercase outline-none focus-visible:ring-2 focus-visible:ring-sky-500',
-              locked ? 'border-slate-200 text-slate-300' : 'border-slate-300 text-slate-400 hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700',
+              locked ? 'border-line text-ink/30' : 'border-ink/25 text-ink/45 hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700',
               pickerPost === post.id && 'border-sky-500 bg-sky-50 text-sky-700',
             )}
           >

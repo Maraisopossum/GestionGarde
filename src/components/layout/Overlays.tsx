@@ -35,7 +35,7 @@ export function Toasts() {
             <Icon className={clsx('size-5 shrink-0', T.cls)} />
             <span className="min-w-0 flex-1 leading-snug">{t.text}</span>
             {t.undoable && (
-              <button type="button" onClick={() => { undo(); dismiss(t.id) }} className="flex h-7 items-center gap-1 rounded px-2 text-[12px] font-bold text-sky-300 uppercase hover:bg-white/10">
+              <button type="button" onClick={() => { undo(); dismiss(t.id) }} className="flex h-7 items-center gap-1 rounded px-2 text-[12px] font-semibold text-sky-300 uppercase hover:bg-white/10">
                 <Undo2 className="size-3.5" /> Annuler
               </button>
             )}
@@ -61,18 +61,18 @@ export function ConfirmDialog() {
   if (!c) return null
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center bg-ink/45 p-4" onClick={() => ask(null)}>
-      <div role="alertdialog" aria-modal className="up-in w-full max-w-sm rounded-xl bg-white p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div role="alertdialog" aria-modal className="up-in w-full max-w-sm rounded-xl bg-paper p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-[16px] font-semibold text-ink">{c.title}</h2>
-        {c.body && <p className="mt-1.5 text-[13.5px] leading-relaxed text-slate-600">{c.body}</p>}
+        {c.body && <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted">{c.body}</p>}
         <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={() => ask(null)} className="h-9 rounded-md border border-line px-3.5 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">
+          <button type="button" onClick={() => ask(null)} className="h-9 rounded-md border border-line px-3.5 text-[13px] font-semibold text-ink/85 hover:bg-ink/[0.03]">
             Annuler
           </button>
           <button
             type="button"
             autoFocus
             onClick={() => { c.onConfirm(); ask(null) }}
-            className={clsx('h-9 rounded-md px-3.5 text-[13px] font-semibold text-white', c.tone === 'danger' ? 'bg-mission hover:bg-red-700' : 'bg-ink hover:bg-ink-3')}
+            className={clsx('h-9 rounded-md px-3.5 text-[13px] font-semibold text-white', c.tone === 'danger' ? 'bg-mission hover:bg-red-700' : 'bg-ink shadow-inset hover:bg-ink-2 active:opacity-80')}
           >
             {c.confirmLabel}
           </button>

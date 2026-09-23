@@ -18,12 +18,12 @@ export function Plus() {
   const items = [...NAV.filter((n) => ['/personnel', '/vehicules', '/historique'].includes(n.to)), { to: '/parametres', label: 'Paramètres', icon: Settings }]
   return (
     <div className="space-y-4 p-3">
-      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
+      <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper">
         {items.map(({ to, label, icon: Icon }) => (
           <li key={to}>
             <Link to={to} className="flex h-14 items-center gap-3 px-4 text-[15px] font-medium text-ink">
-              <Icon className="size-5 text-slate-500" /> {label}
-              <ChevronRight className="ml-auto size-5 text-slate-300" />
+              <Icon className="size-5 text-muted" /> {label}
+              <ChevronRight className="ml-auto size-5 text-ink/30" />
             </Link>
           </li>
         ))}

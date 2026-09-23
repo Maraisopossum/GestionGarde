@@ -9,8 +9,8 @@ import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
 import { SPEC_META } from '../ui/badges'
 
-function Kpi({ value, total, sub, label, icon: Icon, tone = 'neutral', onClick, title, compact }: {
-  value: number; total?: number; sub?: string; compact?: boolean; label: string; icon: typeof Sun; tone?: 'neutral' | 'ok' | 'mission' | 'warn' | 'danger'; onClick: () => void; title?: string
+function Kpi({ value, total, sub, label, icon: Icon, tone = 'neutral', onClick, title, compact, accent }: {
+  value: number; total?: number; sub?: string; compact?: boolean; accent?: string; label: string; icon: typeof Sun; tone?: 'neutral' | 'ok' | 'mission' | 'warn' | 'danger'; onClick: () => void; title?: string
 }) {
   return (
     <button
@@ -18,23 +18,22 @@ function Kpi({ value, total, sub, label, icon: Icon, tone = 'neutral', onClick, 
       onClick={onClick}
       title={title}
       className={clsx(
-        'flex shrink-0 items-center rounded-lg border text-left transition-colors',
+        'flex shrink-0 items-center rounded-xl border text-left transition-colors active:opacity-80',
         compact ? 'h-12 min-w-0 gap-1.5 px-2' : 'h-[54px] gap-2 pr-3 pl-2.5',
-        tone === 'danger' ? 'pulse-danger border-mission bg-mission text-white' : 'border-white/10 bg-white/[0.06] hover:bg-white/[0.11]',
-        tone === 'warn' && 'border-amber-400/70',
+        tone === 'danger' ? 'pulse-danger border-mission bg-mission text-white' : tone === 'warn' ? 'border-amber-400 bg-amber-50 text-ink' : 'border-line bg-paper text-ink hover:border-ink/25',
       )}
     >
       <Icon
-        className={clsx(compact ? 'size-[18px] shrink-0' : 'size-6 shrink-0', tone === 'ok' && 'text-ok-dot', tone === 'mission' && 'text-red-400', tone === 'warn' && 'text-amber-300', tone === 'neutral' && 'text-sky-300')}
+        className={clsx(compact ? 'size-[18px] shrink-0' : 'size-6 shrink-0', tone === 'ok' && 'text-ok', tone === 'mission' && 'text-mission', tone === 'warn' && 'text-amber-600', tone === 'neutral' && (accent ?? 'text-muted'))}
         strokeWidth={2.25}
       />
       <span className="leading-none">
-        <span className={clsx('block font-display font-bold whitespace-nowrap tabular-nums', compact ? 'text-[21px]' : 'text-[26px]', tone === 'warn' && 'text-amber-300')}>
+        <span className={clsx('block font-display font-semibold whitespace-nowrap tabular-nums', compact ? 'text-[21px] tracking-tight' : 'text-[26px] tracking-tight', tone === 'warn' && 'text-amber-700')}>
           {value}
-          {total !== undefined && <span className="text-[15px] font-semibold text-white/45"> /{total}</span>}
-          {sub && !compact && <span className="ml-1 font-sans text-[12px] font-semibold text-white/55">{sub}</span>}
+          {total !== undefined && <span className={clsx('text-[15px] font-medium', tone === 'danger' ? 'text-white/70' : 'text-ink/40')}> /{total}</span>}
+          {sub && !compact && <span className="ml-1 font-sans text-[12px] font-medium tracking-normal text-muted">{sub}</span>}
         </span>
-        <span className={clsx('mt-0.5 block truncate font-semibold tracking-wide uppercase', compact ? 'text-[9.5px]' : 'text-[11px]', tone === 'danger' ? 'text-white' : 'text-white/65')}>{label}</span>
+        <span className={clsx('mt-0.5 block truncate font-medium', compact ? 'text-[10.5px]' : 'text-[12px]', tone === 'danger' ? 'text-white' : 'text-muted')}>{label}</span>
       </span>
     </button>
   )
@@ -66,8 +65,9 @@ export function Kpis({ compact }: { compact?: boolean }) {
             compact={compact}
             value={n}
             total={d.specialiteTotal[sp].length}
-            label={n === 0 ? `0 ${m.label} dispo` : m.label}
+            label={n === 0 ? `Aucun ${m.label} dispo` : m.label}
             icon={m.icon}
+            accent={SPEC_META[sp].text}
             tone={n === 0 ? 'danger' : n === 1 ? 'warn' : 'neutral'}
             onClick={() => filterSpec(sp)}
             title={`${m.label} disponibles / présents`}
@@ -87,15 +87,15 @@ export function TopBar() {
 
   if (mobile)
     return (
-      <header className="bg-ink text-white">
-        <div className="pt-safe sticky top-0 z-30 flex items-center gap-3 bg-ink px-4 pt-2.5 pb-2 shadow-[0_1px_0_rgb(255_255_255/0.06)]">
+      <header className="border-b border-line bg-canvas text-ink">
+        <div className="pt-safe sticky top-0 z-30 flex items-center gap-3 bg-canvas/95 px-4 pt-2.5 pb-2 backdrop-blur">
           <div className="min-w-0 flex-1">
-            <h1 className="font-display text-[22px] leading-none font-bold tracking-wide">GARDE — BRUXELLES</h1>
-            <p className="mt-1 flex items-center gap-1.5 truncate text-[12px] text-white/70">
-              <ShiftIcon className="size-3.5 text-amber-300" /> {shift.label}
+            <h1 className="font-display text-[22px] leading-none font-semibold tracking-[-0.5px]">Garde — Bruxelles</h1>
+            <p className="mt-1 flex items-center gap-1.5 truncate text-[12px] text-muted">
+              <ShiftIcon className="size-3.5 text-amber-500" /> {shift.label}
             </p>
           </div>
-          <p className="font-display text-[28px] leading-none font-bold tabular-nums">{fmtTime(now)}</p>
+          <p className="font-display text-[28px] leading-none font-semibold tracking-tight tabular-nums">{fmtTime(now)}</p>
         </div>
         <div className="grid grid-cols-3 gap-1.5 px-3 pb-3">
           <Kpis compact />
@@ -104,14 +104,14 @@ export function TopBar() {
     )
 
   return (
-    <header className="bg-ink text-white">
+    <header className="border-b border-line bg-canvas text-ink">
       <div className="flex items-center gap-5 px-5 py-3">
         <div className="min-w-0 shrink">
-          <h1 className="font-display text-[32px] leading-none font-bold tracking-wide">GARDE — BRUXELLES</h1>
-          <p className="mt-1.5 flex items-center gap-2 text-[13.5px] whitespace-nowrap text-white/75">
+          <h1 className="font-display text-[34px] leading-none font-semibold tracking-[-0.9px]">Garde — Bruxelles</h1>
+          <p className="mt-2 flex items-center gap-2 text-[14px] whitespace-nowrap text-muted">
             {fmtDate(now)}
-            <span className="text-white/30">·</span>
-            <ShiftIcon className="size-4 shrink-0 text-amber-300" />
+            <span className="text-ink/25">·</span>
+            <ShiftIcon className="size-4 shrink-0 text-amber-500" />
             Quart {shift.kind === 'JOUR' ? 'de jour' : 'de nuit'} ({shift.label.split('·')[1].trim()})
           </p>
         </div>
@@ -119,8 +119,8 @@ export function TopBar() {
           <Kpis />
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-display text-[36px] leading-none font-bold tabular-nums">{fmtTime(now)}</p>
-          <p className="mt-1 flex items-center justify-end gap-1.5 text-[11.5px] text-white/60">
+          <p className="font-display text-[36px] leading-none font-semibold tracking-[-1px] tabular-nums">{fmtTime(now)}</p>
+          <p className="mt-1 flex items-center justify-end gap-1.5 text-[12px] text-muted">
             <span className="size-1.5 rounded-full bg-ok-dot" /> Synchronisé · démo
           </p>
         </div>

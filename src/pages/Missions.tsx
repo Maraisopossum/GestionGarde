@@ -25,9 +25,9 @@ export function Missions() {
   return (
     <Page title="Missions" subtitle={`${ongoing.length} intervention${ongoing.length > 1 ? 's' : ''} en cours · ${d.enMission.length} personnes engagées`}>
       <section>
-        <h2 className="mb-2 flex items-center gap-2 text-[12px] font-bold tracking-wider text-slate-500 uppercase"><Siren className="size-4 text-mission" /> En cours</h2>
+        <h2 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wider text-muted uppercase"><Siren className="size-4 text-mission" /> En cours</h2>
         {ongoing.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-line bg-white px-4 py-8 text-center text-sm text-slate-500">Aucun véhicule en intervention.</p>
+          <p className="rounded-xl border border-dashed border-line bg-paper px-4 py-8 text-center text-sm text-muted">Aucun véhicule en intervention.</p>
         ) : (
           <div className="grid items-start gap-3 md:grid-cols-2 xl:grid-cols-3">
             {ongoing.map((ms) => {
@@ -36,17 +36,17 @@ export function Missions() {
               const crew = ms.flatMap((x) => x.crew)
               const title = vs.length > 1 ? `${vs[0].groupe} (VO + P)` : vs[0].nom
               return (
-                <article key={m.id} className="overflow-hidden rounded-xl border border-mission/35 bg-white">
+                <article key={m.id} className="overflow-hidden rounded-xl border border-mission/35 bg-paper">
                   <div className="h-1 bg-mission" />
                   <header className="flex items-center gap-3 bg-mission-soft/60 px-4 py-2.5">
                     <div className="min-w-0 flex-1">
-                      <h3 className="truncate font-display text-[19px] font-bold tracking-wide text-ink uppercase">{title}</h3>
-                      <p className="text-[12px] text-slate-600">Sorti à <b>{fmtTime(m.start)}</b></p>
+                      <h3 className="truncate font-display text-[19px] font-semibold tracking-tight text-ink">{title}</h3>
+                      <p className="text-[12px] text-muted">Sorti à <b>{fmtTime(m.start)}</b></p>
                     </div>
-                    <p className="font-display text-[26px] font-bold text-mission tabular-nums">{fmtDuration(m.start, now)}</p>
+                    <p className="font-display text-[26px] font-semibold text-mission tabular-nums">{fmtDuration(m.start, now)}</p>
                   </header>
                   <ul className="space-y-1.5 px-4 py-3">
-                    {crew.length === 0 && <li className="text-[13px] text-slate-500">Sans équipage</li>}
+                    {crew.length === 0 && <li className="text-[13px] text-muted">Sans équipage</li>}
                     {crew.map((pid) => {
                       const p = d.personById[pid]
                       return p && (
@@ -65,21 +65,21 @@ export function Missions() {
       </section>
 
       <section>
-        <h2 className="mb-2 flex items-center gap-2 text-[12px] font-bold tracking-wider text-slate-500 uppercase"><CircleCheck className="size-4 text-ok" /> Terminées pendant la garde</h2>
-        <div className="overflow-x-auto rounded-xl border border-line bg-white">
+        <h2 className="mb-2 flex items-center gap-2 text-[12px] font-semibold tracking-wider text-muted uppercase"><CircleCheck className="size-4 text-ok" /> Terminées pendant la garde</h2>
+        <div className="overflow-x-auto rounded-xl border border-line bg-paper">
           <table className="w-full min-w-[560px]">
-            <thead className="border-b border-line bg-slate-50 text-left text-[11px] font-bold tracking-wider text-slate-500 uppercase">
+            <thead className="border-b border-line bg-ink/[0.03] text-left text-[11px] font-semibold tracking-wider text-muted uppercase">
               <tr><th className="px-4 py-2">Véhicule</th><th className="px-4 py-2">Sortie</th><th className="px-4 py-2">Retour</th><th className="px-4 py-2">Durée</th><th className="px-4 py-2">Équipage</th></tr>
             </thead>
             <tbody className="text-[13px]">
-              {done.length === 0 && <tr><td colSpan={5} className="px-4 py-6 text-center text-slate-500">Aucune mission terminée.</td></tr>}
+              {done.length === 0 && <tr><td colSpan={5} className="px-4 py-6 text-center text-muted">Aucune mission terminée.</td></tr>}
               {done.map((m) => (
                 <tr key={m.id} className="border-b border-line/70 last:border-0">
                   <td className="px-4 py-2 font-semibold">{VEHICLE_BY_ID[m.vehicleId].nom}</td>
                   <td className="px-4 py-2 tabular-nums">{fmtTime(m.start)}</td>
                   <td className="px-4 py-2 tabular-nums">{fmtTime(m.end)}</td>
                   <td className="px-4 py-2 tabular-nums">{fmtDuration(m.start, m.end!)}</td>
-                  <td className="px-4 py-2 text-slate-600">{m.crew.map((pid) => d.personById[pid] && personName(d.personById[pid])).join(' · ')}</td>
+                  <td className="px-4 py-2 text-muted">{m.crew.map((pid) => d.personById[pid] && personName(d.personById[pid])).join(' · ')}</td>
                 </tr>
               ))}
             </tbody>

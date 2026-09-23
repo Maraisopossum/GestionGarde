@@ -48,7 +48,7 @@ export function DndLayer({ children }: { children: ReactNode }) {
       {children}
       <DragOverlay dropAnimation={{ duration: 150, easing: 'ease-out' }}>
         {person && (
-          <div className="flex h-9 w-60 cursor-grabbing items-center rounded-md border border-sky-400 bg-white px-2 shadow-[0_10px_28px_rgb(15_29_51/0.28)] ring-2 ring-sky-400/30">
+          <div className="flex h-9 w-60 cursor-grabbing items-center rounded-md border border-sky-400 bg-paper px-2 shadow-[0_10px_28px_rgb(15_29_51/0.28)] ring-2 ring-sky-400/30">
             <PersonInline person={person} />
           </div>
         )}

@@ -15,8 +15,8 @@ const SHIFTS: { id: ShiftMode; label: string }[] = [
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-xl border border-line bg-white p-4">
-      <h2 className="mb-3 text-[12px] font-bold tracking-wider text-slate-500 uppercase">{title}</h2>
+    <section className="rounded-xl border border-line bg-paper p-4">
+      <h2 className="mb-3 text-[12px] font-semibold tracking-wider text-muted uppercase">{title}</h2>
       {children}
     </section>
   )
@@ -33,18 +33,18 @@ export function Parametres() {
     <Page title="Paramètres">
       <div className="grid max-w-4xl gap-4 md:grid-cols-2">
         <Card title="Quart affiché">
-          <div className="grid grid-cols-3 gap-1 rounded-md bg-slate-100 p-1">
+          <div className="grid grid-cols-3 gap-1 rounded-md bg-ink/[0.05] p-1">
             {SHIFTS.map((s) => (
-              <button key={s.id} type="button" onClick={() => setShift(s.id)} className={clsx('h-9 rounded text-[12.5px] font-semibold', shift === s.id ? 'bg-white text-ink shadow-sm' : 'text-slate-500')}>
+              <button key={s.id} type="button" onClick={() => setShift(s.id)} className={clsx('h-9 rounded text-[12.5px] font-semibold', shift === s.id ? 'bg-paper text-ink shadow-sm' : 'text-muted')}>
                 {s.label}
               </button>
             ))}
           </div>
-          <p className="mt-2 text-[12.5px] text-slate-500">En automatique, le quart suit l’heure (07h00 / 19h00).</p>
+          <p className="mt-2 text-[12.5px] text-muted">En automatique, le quart suit l’heure (07h00 / 19h00).</p>
         </Card>
 
         <Card title="Données de démonstration">
-          <p className="mb-3 text-[13px] text-slate-600">
+          <p className="mb-3 text-[13px] text-muted">
             Les manipulations sont enregistrées dans ce navigateur uniquement. Réinitialiser restaure le scénario fictif de départ.
           </p>
           <button
@@ -60,11 +60,11 @@ export function Parametres() {
           {install.installed ? (
             <p className="text-[13px] text-ok">L’application est installée sur cet appareil.</p>
           ) : install.canPrompt ? (
-            <button type="button" onClick={install.prompt} className="flex h-9 items-center gap-2 rounded-md bg-ink px-3 text-[13px] font-semibold text-white">
+            <button type="button" onClick={install.prompt} className="flex h-9 items-center gap-2 rounded-md bg-ink px-3 text-[13px] font-semibold text-paper shadow-inset active:opacity-80">
               <Download className="size-4" /> Installer l’application
             </button>
           ) : (
-            <p className="text-[13px] leading-relaxed text-slate-600">
+            <p className="text-[13px] leading-relaxed text-muted">
               {install.ios
                 ? <>Sur iPhone / iPad : ouvrez ce site dans Safari, touchez <Share className="inline size-3.5 align-[-2px]" /> puis « Sur l’écran d’accueil ».</>
                 : <>Sur Android ou ordinateur (Chrome, Edge) : menu du navigateur → « Installer l’application ». Elle fonctionne ensuite en plein écran et hors connexion.</>}
@@ -73,10 +73,10 @@ export function Parametres() {
         </Card>
 
         <Card title="À propos de cette maquette">
-          <ul className="list-disc space-y-1 pl-4 text-[13px] text-slate-600">
+          <ul className="list-disc space-y-1 pl-4 text-[13px] text-muted">
             <li>Toutes les données (noms, affectations, missions) sont <b>fictives</b>.</li>
             <li>Les règles de qualification (N°6 ≥ Sgt, N°5 et chauffeurs = qualification Chauffeur, Plong. = spécialité Plongeur…) sont des hypothèses à valider.</li>
-            <li>Raccourci : <kbd className="rounded border border-line bg-slate-50 px-1 text-[11px]">Ctrl</kbd>+<kbd className="rounded border border-line bg-slate-50 px-1 text-[11px]">Z</kbd> annule la dernière action.</li>
+            <li>Raccourci : <kbd className="rounded border border-line bg-ink/[0.03] px-1 text-[11px]">Ctrl</kbd>+<kbd className="rounded border border-line bg-ink/[0.03] px-1 text-[11px]">Z</kbd> annule la dernière action.</li>
           </ul>
         </Card>
       </div>

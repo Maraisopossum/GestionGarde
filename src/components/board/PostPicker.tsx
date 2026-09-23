@@ -54,17 +54,17 @@ function CandidateList({ postId, onDone }: { postId: string; onDone: () => void 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative border-b border-line px-3 py-2">
-        <Search className="pointer-events-none absolute top-1/2 left-5.5 size-4 -translate-y-1/2 text-slate-400" />
+        <Search className="pointer-events-none absolute top-1/2 left-5.5 size-4 -translate-y-1/2 text-ink/45" />
         <input
           ref={inputRef}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Nom, grade, spécialité…"
-          className="h-9 w-full rounded-md border border-line bg-slate-50 pr-2 pl-8 text-sm outline-none focus:border-sky-500 focus:bg-white"
+          className="h-9 w-full rounded-md border border-line bg-ink/[0.03] pr-2 pl-8 text-sm outline-none focus:border-sky-500 focus:bg-paper"
         />
       </div>
       <ul className="scroll-thin min-h-0 flex-1 overflow-y-auto py-1">
-        {rows.length === 0 && <li className="px-4 py-6 text-center text-sm text-slate-500">Aucun personnel disponible</li>}
+        {rows.length === 0 && <li className="px-4 py-6 text-center text-sm text-muted">Aucun personnel disponible</li>}
         {rows.map(({ p, ok, st }) => {
           const current = st.vehiclePosts[0]
           let hint = 'Libre'
@@ -76,19 +76,19 @@ function CandidateList({ postId, onDone }: { postId: string; onDone: () => void 
               <button
                 type="button"
                 onClick={() => assign(p, postId, null, onDone)}
-                className={clsx('flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-slate-50 focus-visible:bg-sky-50 focus-visible:outline-none', !ok && 'opacity-60')}
+                className={clsx('flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-ink/[0.03] focus-visible:bg-sky-50 focus-visible:outline-none', !ok && 'opacity-60')}
               >
                 <Avatar person={p} />
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
-                    <span className="truncate text-[13px] font-semibold text-slate-800">{personName(p)}</span>
+                    <span className="truncate text-[13px] font-semibold text-ink">{personName(p)}</span>
                     <SpecBadges specs={p.specialites} variant="icon" />
                   </span>
-                  <span className={clsx('block truncate text-[11.5px]', !ok ? 'text-reserve' : hint === 'Libre' ? 'text-ok' : 'text-slate-500')}>
+                  <span className={clsx('block truncate text-[11.5px]', !ok ? 'text-reserve' : hint === 'Libre' ? 'text-ok' : 'text-muted')}>
                     {!ok ? `Qualification manquante : ${checkPost(p, postId).missing.join(', ')}` : hint}
                   </span>
                 </span>
-                {occupant && current && !coord && <ArrowLeftRight className="size-4 text-slate-400" />}
+                {occupant && current && !coord && <ArrowLeftRight className="size-4 text-ink/45" />}
               </button>
             </li>
           )
@@ -114,14 +114,14 @@ function PickerBody({ postId, onClose }: { postId: string; onClose: () => void }
     <>
       <header className="flex items-start gap-2 border-b border-line px-3 py-2.5">
         <div className="min-w-0 flex-1">
-          <p className="text-[10.5px] font-semibold tracking-wider text-slate-400 uppercase">
+          <p className="text-[10.5px] font-semibold tracking-wider text-ink/45 uppercase">
             {mode === 'list' ? (occupant ? 'Remplacer / permuter' : 'Affecter au poste') : 'Poste'}
           </p>
           <p className="truncate text-[14px] font-semibold text-ink">
-            {v.section === 'coordination' ? v.nom : <>{post.label} <span className="font-normal text-slate-500">· {v.nom}</span></>}
+            {v.section === 'coordination' ? v.nom : <>{post.label} <span className="font-normal text-muted">· {v.nom}</span></>}
           </p>
         </div>
-        <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-7 place-items-center rounded text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+        <button type="button" onClick={onClose} aria-label="Fermer" className="grid size-7 place-items-center rounded text-ink/45 hover:bg-ink/[0.05] hover:text-ink/85">
           <X className="size-4" />
         </button>
       </header>
@@ -131,7 +131,7 @@ function PickerBody({ postId, onClose }: { postId: string; onClose: () => void }
           <div className="flex items-center gap-2.5">
             <Avatar person={occupant} size="sm" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-semibold">{personName(occupant)} <span className="font-normal text-slate-500">{occupant.prenom}</span></p>
+              <p className="truncate text-[14px] font-semibold">{personName(occupant)} <span className="font-normal text-muted">{occupant.prenom}</span></p>
               <SpecBadges specs={occupant.specialites} />
             </div>
           </div>
@@ -141,15 +141,15 @@ function PickerBody({ postId, onClose }: { postId: string; onClose: () => void }
             </p>
           ) : (
             <div className="mt-3 grid gap-1.5">
-              <button type="button" onClick={() => setMode('list')} className="flex h-9 items-center gap-2 rounded-md bg-ink px-3 text-[13px] font-semibold text-white hover:bg-ink-3">
+              <button type="button" onClick={() => setMode('list')} className="flex h-9 items-center gap-2 rounded-md bg-ink px-3 text-[13px] font-semibold text-paper shadow-inset active:opacity-80 hover:bg-ink-3">
                 <ArrowLeftRight className="size-4" /> Remplacer ou permuter…
               </button>
-              <button type="button" onClick={() => { unassign(postId); onClose() }} className="flex h-9 items-center gap-2 rounded-md border border-line px-3 text-[13px] font-medium text-slate-700 hover:bg-slate-50">
+              <button type="button" onClick={() => { unassign(postId); onClose() }} className="flex h-9 items-center gap-2 rounded-md border border-line px-3 text-[13px] font-medium text-ink/85 hover:bg-ink/[0.03]">
                 <UserMinus className="size-4" /> Retirer du poste
               </button>
             </div>
           )}
-          <button type="button" onClick={() => openSheet(occupant.id)} className="mt-1.5 flex h-9 w-full items-center gap-2 rounded-md border border-line px-3 text-[13px] font-medium text-slate-700 hover:bg-slate-50">
+          <button type="button" onClick={() => openSheet(occupant.id)} className="mt-1.5 flex h-9 w-full items-center gap-2 rounded-md border border-line px-3 text-[13px] font-medium text-ink/85 hover:bg-ink/[0.03]">
             <UserRound className="size-4" /> Voir la fiche
           </button>
         </div>
@@ -192,7 +192,7 @@ export function PostPicker() {
   if (mobile)
     return (
       <div className="fixed inset-0 z-50 flex items-end bg-ink/40">
-        <div ref={ref} role="dialog" className="up-in pb-safe flex max-h-[80vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl">
+        <div ref={ref} role="dialog" className="up-in pb-safe flex max-h-[80vh] w-full flex-col overflow-hidden rounded-t-2xl bg-paper shadow-2xl">
           <PickerBody key={picker.postId} postId={picker.postId} onClose={close} />
         </div>
       </div>
@@ -203,7 +203,7 @@ export function PostPicker() {
       ref={ref}
       role="dialog"
       style={{ left: pos.left, top: pos.top, bottom: pos.bottom, maxHeight: pos.maxH }}
-      className="fixed z-50 flex w-80 flex-col overflow-hidden rounded-xl border border-line bg-white shadow-[0_12px_40px_rgb(15_29_51/0.22)]"
+      className="fixed z-50 flex w-80 flex-col overflow-hidden rounded-xl border border-line bg-paper shadow-[0_12px_40px_rgb(15_29_51/0.22)]"
     >
       <PickerBody key={picker.postId} postId={picker.postId} onClose={close} />
     </div>
