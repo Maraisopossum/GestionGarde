@@ -53,7 +53,7 @@ export function Section({ id, children, count = true }: { id: SectionId; childre
   )
 }
 
-const grid = (min: number) => ({ gridTemplateColumns: `repeat(auto-fill, minmax(min(${min}px, 100%), 1fr))` })
+const grid = (min: number) => ({ gridTemplateColumns: `repeat(auto-fit, minmax(min(${min}px, 100%), 1fr))` })
 
 export function IncendieSection() {
   const all = vehiclesOf('incendie')

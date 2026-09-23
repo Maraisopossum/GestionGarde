@@ -113,7 +113,7 @@ export function MobileBoard() {
   return (
     <div className="space-y-5 px-3 pt-3 pb-4">
       <AlertBar />
-      <div className="sticky top-[calc(3.9rem+env(safe-area-inset-top))] z-20 -mx-3 bg-canvas/95 px-3 py-1 backdrop-blur-sm"><HighlightBar /></div>
+      <HighlightBar />
       <MobileSection id="incendie" />
       <MobileSection id="ambulances" />
       <MobileSection id="techniques" />

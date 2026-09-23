@@ -35,7 +35,9 @@ function Shortcuts() {
 
 function Layout() {
   const mobile = useIsMobile()
-  const collapsed = useMedia('(max-width: 1279px)')
+  const sidebarOpen = useUI((s) => s.sidebarOpen)
+  const tablet = useMedia('(max-width: 1279px)')
+  const collapsed = tablet || !sidebarOpen
   const { pathname } = useLocation()
   useEffect(() => {
     const ui = useUI.getState()
@@ -70,7 +72,7 @@ function Layout() {
   return (
     <DndLayer>
       <div className="flex h-full">
-        <Sidebar collapsed={collapsed} />
+        <Sidebar collapsed={collapsed} canToggle={!tablet} />
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
           <main className="min-h-0 flex-1 overflow-y-auto">

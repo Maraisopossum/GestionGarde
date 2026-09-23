@@ -78,10 +78,10 @@ export function Avatar({ person, size = 'sm', className }: { person: Person; siz
 /* ----------------------------------------------------------------- États véhicule */
 
 export const STATE_META: Record<VehicleState, { label: string; pill: string; bar: string; soft: string; dot: string }> = {
-  DISPONIBLE: { label: 'Disponible', pill: 'bg-ok text-white', bar: 'bg-ok', soft: 'bg-ok-soft', dot: 'bg-ok-dot' },
+  DISPONIBLE: { label: 'Disponible', pill: 'bg-ok-soft text-ok', bar: 'bg-ok', soft: 'bg-ok-soft', dot: 'bg-ok-dot' },
   EN_MISSION: { label: 'En mission', pill: 'bg-mission text-white', bar: 'bg-mission', soft: 'bg-mission-soft', dot: 'bg-mission' },
-  RESERVE: { label: 'Réserve', pill: 'bg-reserve text-white', bar: 'bg-reserve', soft: 'bg-reserve-soft', dot: 'bg-reserve' },
-  INDISPONIBLE: { label: 'Indisponible', pill: 'bg-off text-white', bar: 'bg-off', soft: 'bg-off-soft', dot: 'bg-off' },
+  RESERVE: { label: 'Réserve', pill: 'bg-reserve-soft text-reserve', bar: 'bg-reserve', soft: 'bg-reserve-soft', dot: 'bg-reserve' },
+  INDISPONIBLE: { label: 'Indisponible', pill: 'bg-off-soft text-off', bar: 'bg-off', soft: 'bg-off-soft', dot: 'bg-off' },
 }
 
 export function StatePill({ state, since, size = 'md' }: { state: VehicleState; since?: string; size?: 'sm' | 'md' }) {
@@ -89,12 +89,12 @@ export function StatePill({ state, since, size = 'md' }: { state: VehicleState; 
   return (
     <span
       className={clsx(
-        'inline-flex items-center gap-1.5 rounded font-semibold tracking-wide uppercase',
+        'inline-flex items-center gap-1.5 rounded-full font-semibold whitespace-nowrap',
         m.pill,
-        size === 'md' ? 'h-6 px-2 text-[11px]' : 'h-5 px-1.5 text-[10px]',
+        size === 'md' ? 'h-6 px-2.5 text-[12px]' : 'h-5 px-2 text-[11px]',
       )}
     >
-      {state === 'EN_MISSION' ? <Siren className="size-3.5" strokeWidth={2.5} /> : <span className="size-1.5 rounded-full bg-white/90" />}
+      {state === 'EN_MISSION' ? <Siren className="size-3.5" strokeWidth={2.5} /> : <span className={clsx('size-1.5 rounded-full', m.dot)} />}
       {state === 'EN_MISSION' ? 'Sorti' : m.label}
       {state === 'EN_MISSION' && since && <span className="font-semibold tabular-nums opacity-95">{fmtTime(since)}</span>}
     </span>

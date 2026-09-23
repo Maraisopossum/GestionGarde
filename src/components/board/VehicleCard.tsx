@@ -38,7 +38,7 @@ export function MainAction({ vehicles, size = 'md', full = true, suffix }: { veh
   const { sortir, retour } = useVehicleActions()
   const list = states.split(',') as VehicleState[]
   const base = clsx(
-    'inline-flex items-center justify-center gap-1.5 rounded-md font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 active:opacity-80 touch-manipulation',
+    'inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 active:opacity-80 touch-manipulation',
     size === 'md' ? 'h-9 px-4 text-[14px]' : 'h-8 px-3 text-[13px]',
     full && 'w-full',
   )
@@ -80,7 +80,7 @@ export function StateMenu({ vehicle }: { vehicle: Vehicle }) {
         type="button"
         aria-label={`État de ${vehicle.nom}`}
         onClick={() => setOpen((o) => !o)}
-        className="grid size-7 place-items-center rounded text-ink/45 hover:bg-ink/[0.05] hover:text-ink/85"
+        className="grid size-7 place-items-center rounded-full text-ink/45 hover:bg-ink/[0.05] hover:text-ink/85 pointer-fine:opacity-0 pointer-fine:group-hover/card:opacity-100 focus-visible:opacity-100"
       >
         <EllipsisVertical className="size-4" />
       </button>
@@ -114,6 +114,7 @@ function Elapsed({ since }: { since: string }) {
 function CrewCount({ vehicle }: { vehicle: Vehicle }) {
   const filled = useGarde((s) => vehicle.posts.filter((p) => s.assignments[p.id]).length)
   const total = vehicle.posts.length
+  if (filled === total) return null
   return (
     <span className={clsx('text-[11px] font-semibold tabular-nums', filled < total ? 'text-reserve' : 'text-ink/45')} title="Postes armés">
       {filled}/{total}
@@ -135,7 +136,7 @@ export function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     <article
       id={`veh-${vehicle.id}`}
       className={clsx(
-        'flex flex-col overflow-hidden rounded-xl border bg-paper transition-shadow',
+        'group/card flex flex-col overflow-hidden rounded-2xl border bg-paper transition-shadow hover:shadow-focus',
         out ? 'border-mission/35' : 'border-line',
         flash && 'ring-4 ring-sky-400/60',
       )}
@@ -169,9 +170,9 @@ function SubVehicle({ vehicle, title, hint, showState }: { vehicle: Vehicle; tit
   const status = useGarde((s) => s.vehicleStatus[vehicle.id])
   const out = status.state === 'EN_MISSION'
   return (
-    <section className={clsx('border-l-[3px] py-2 pr-2 pl-2.5', out ? 'border-mission bg-mission-soft/40' : status.state === 'DISPONIBLE' ? 'border-ok' : status.state === 'RESERVE' ? 'border-reserve' : 'border-off')}>
-      <div className="mb-1.5 flex items-center gap-2">
-        <h4 className="text-[11.5px] font-semibold tracking-wide text-muted uppercase" title={hint}>{title}</h4>
+    <section className="px-1 py-1.5">
+      <div className="mb-1.5 flex h-6 items-center gap-2">
+        <h4 className="text-[12.5px] font-semibold text-ink/70" title={hint}>{title}</h4>
         {showState && <StatePill state={status.state} since={status.since} size="sm" />}
         <span className="ml-auto"><CrewCount vehicle={vehicle} /></span>
         <StateMenu vehicle={vehicle} />
@@ -194,7 +195,7 @@ export function DepartCard({ groupe, vo, p }: { groupe: string; vo: Vehicle; p: 
     <article
       id={`veh-${p.id}`}
       className={clsx(
-        'flex flex-col overflow-hidden rounded-xl border bg-paper',
+        'group/card flex flex-col overflow-hidden rounded-2xl border bg-paper transition-shadow hover:shadow-focus',
         agg === 'EN_MISSION' ? 'border-mission/35' : 'border-line',
         flash && 'ring-4 ring-sky-400/60',
       )}
@@ -202,11 +203,11 @@ export function DepartCard({ groupe, vo, p }: { groupe: string; vo: Vehicle; p: 
       <span id={`veh-${vo.id}`} />
       <div className={clsx('h-1', STATE_META[agg].bar)} />
       <header className={clsx('flex items-center gap-2 px-3 pt-2 pb-1.5', agg === 'EN_MISSION' && 'bg-mission-soft/50')}>
-        <h3 className="font-display text-[19px] leading-tight font-semibold tracking-tight text-ink">{groupe}</h3>
+        <h3 className="font-display text-[19px] leading-tight font-semibold whitespace-nowrap tracking-tight text-ink">{groupe}</h3>
         {same && <StatePill state={agg} since={since} />}
-        {same && agg === 'EN_MISSION' && since && <Elapsed since={since} />}
+
       </header>
-      <div className="flex-1 space-y-2 px-2 pb-2">
+      <div className="flex-1 divide-y divide-line px-2 pb-1">
         <SubVehicle vehicle={vo} title="VO R" hint={vo.nom} showState={!same} />
         <SubVehicle vehicle={p} title="Autopompe P" hint={p.nom} showState={!same} />
       </div>

@@ -161,7 +161,7 @@ export function AvailablePanel({ className, onClose }: { className?: string; onC
                 onClick={() => setCapFilter(on ? null : c.id)}
                 aria-pressed={on}
                 className={clsx(
-                  'h-7 rounded-full border px-2.5 text-[11px] font-semibold tracking-wide uppercase transition-colors',
+                  'h-7 rounded-full border px-2.5 text-[12px] font-medium transition-colors',
                   on ? clsx('border-transparent text-white shadow-sm', CAP_META[c.id].solid) : clsx('border-transparent', CAP_META[c.id].soft, CAP_META[c.id].text, 'hover:border-ink/25'),
                 )}
               >
