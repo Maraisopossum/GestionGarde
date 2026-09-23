@@ -3,7 +3,7 @@ import { ArrowDown, ArrowUp, Check, Search } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { Page } from '../components/layout/Page'
 import { statusLine } from '../components/people/AvailablePanel'
-import { Avatar, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../components/ui/badges'
+import { Avatar, OrgBadge, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../components/ui/badges'
 import { personName } from '../domain/selectors'
 import { GRADE_RANK, SPECIALITES, type Person, type PersonStatusKind } from '../domain/types'
 import { useIsMobile } from '../lib/useMedia'
@@ -133,7 +133,7 @@ export function Personnel() {
                         <span className="text-[12.5px] text-ink/45">{p.prenom}</span>
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-[13px]">{p.grade}</td>
+                    <td className="px-3 py-2 text-[13px]">{p.organisme ? <OrgBadge org={p.organisme} short /> : p.grade}</td>
                     <td className="px-3 py-2"><StatusCell kind={st.kind} /></td>
                     <td className="max-w-[260px] truncate px-3 py-2 text-[12.5px] text-muted">{statusLine(p, st)}</td>
                     {SPECIALITES.map((s) => (

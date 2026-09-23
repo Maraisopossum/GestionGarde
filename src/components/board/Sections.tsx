@@ -1,11 +1,12 @@
 import clsx from 'clsx'
-import { Ambulance, Flame, Network, Wrench, type LucideIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { Ambulance, Flame, Network, Plus, Wrench, type LucideIcon } from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import { VEHICLES } from '../../data/seed'
 import type { SectionId, Vehicle } from '../../domain/types'
 import { useGarde } from '../../store/useGarde'
+import { AddVehicleDialog } from './AddVehicleDialog'
 import { PostSlot } from './PostSlot'
-import { DepartCard, VehicleCard } from './VehicleCard'
+import { VehicleCard } from './VehicleCard'
 
 export const SECTION_META: Record<SectionId, { title: string; icon: LucideIcon; tone: string }> = {
   incendie: { title: 'Incendie', icon: Flame, tone: 'bg-red-600' },
@@ -15,6 +16,27 @@ export const SECTION_META: Record<SectionId, { title: string; icon: LucideIcon; 
 }
 
 export const vehiclesOf = (section: SectionId) => VEHICLES.filter((v) => v.section === section)
+
+/** Abonne le composant aux véhicules armés pendant la garde (le registre est mis à jour en place). */
+export const useVehicleRegistry = () => useGarde((s) => s.customVehicles)
+
+/** Bouton « + Armer » d'une section, ouvre la fenêtre de création. */
+export function AddVehicleButton({ section, compact }: { section: 'incendie' | 'ambulances' | 'techniques'; compact?: boolean }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title="Armer un nouveau véhicule"
+        className={clsx('flex h-8 shrink-0 items-center gap-1 rounded-full border border-ink/40 text-[13px] text-ink hover:bg-ink/[0.04] active:opacity-80', compact ? 'px-2' : 'px-3')}
+      >
+        <Plus className="size-4" /> {!compact && 'Armer'}
+      </button>
+      {open && <AddVehicleDialog section={section} onClose={() => setOpen(false)} />}
+    </>
+  )
+}
 
 function SectionCount({ vehicles }: { vehicles: Vehicle[] }) {
   const counts = useGarde((s) => {
@@ -47,6 +69,7 @@ export function Section({ id, children, count = true }: { id: SectionId; childre
         </span>
         <h2 id={`sec-${id}`} className="font-display text-[24px] leading-none font-semibold tracking-[-0.6px] text-ink">{m.title}</h2>
         {count && <div className="ml-auto"><SectionCount vehicles={vehiclesOf(id)} /></div>}
+        {id !== 'coordination' && <AddVehicleButton section={id} />}
       </header>
       {children}
     </section>
@@ -55,26 +78,35 @@ export function Section({ id, children, count = true }: { id: SectionId; childre
 
 const grid = (min: number) => ({ gridTemplateColumns: `repeat(auto-fit, minmax(min(${min}px, 100%), 1fr))` })
 
+function Row({ title, children, min }: { title: string; children: ReactNode; min: number }) {
+  return (
+    <div>
+      <h3 className="mb-2 px-1 text-[12.5px] font-medium text-muted">{title}</h3>
+      <div className="grid gap-3" style={grid(min)}>{children}</div>
+    </div>
+  )
+}
+
+/** Incendie : Départs P (AP), Voitures Officier R (VO), puis échelles (AE) et AMB INC — chacun indépendant. */
 export function IncendieSection() {
+  useVehicleRegistry()
   const all = vehiclesOf('incendie')
-  const groupes = [...new Set(all.map((v) => v.groupe).filter(Boolean))] as string[]
-  const autres = all.filter((v) => !v.groupe)
+  const ap = all.filter((v) => v.code === 'AP')
+  const vo = all.filter((v) => v.code === 'VO')
+  const autres = all.filter((v) => v.code !== 'AP' && v.code !== 'VO')
   return (
     <Section id="incendie">
-      <div className="grid gap-3" style={grid(250)}>
-        {groupes.map((g) => {
-          const [vo, p] = all.filter((v) => v.groupe === g)
-          return <DepartCard key={g} groupe={g} vo={vo} p={p} />
-        })}
-      </div>
-      <div className="mt-3 grid gap-3" style={grid(200)}>
-        {autres.map((v) => <VehicleCard key={v.id} vehicle={v} />)}
+      <div className="space-y-4">
+        <Row title="Départs P — autopompes (AP)" min={240}>{ap.map((v) => <VehicleCard key={v.id} vehicle={v} />)}</Row>
+        <Row title="Voitures Officier R (VO)" min={200}>{vo.map((v) => <VehicleCard key={v.id} vehicle={v} />)}</Row>
+        <Row title="Échelles (AE) et AMB INC" min={200}>{autres.map((v) => <VehicleCard key={v.id} vehicle={v} />)}</Row>
       </div>
     </Section>
   )
 }
 
 export function SimpleSection({ id, min = 200 }: { id: 'ambulances' | 'techniques'; min?: number }) {
+  useVehicleRegistry()
   return (
     <Section id={id}>
       <div className="grid gap-3" style={grid(min)}>

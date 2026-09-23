@@ -8,6 +8,10 @@ export const SPECIALITES: Specialite[] = ['PLONGEUR', 'HAZMAT', 'RISC', 'GRIMP']
 /** Qualifications fonctionnelles (hors spécialités) */
 export type Fonction = 'CHEF' | 'CHAUFFEUR'
 
+/** Renforts externes (équipage ou véhicule armé par un autre organisme) */
+export type Organisme = 'CROIX_ROUGE' | 'PROTECTION_CIVILE' | 'AUTRE_ZONE' | 'AUTRE'
+export const ORGANISMES: Organisme[] = ['CROIX_ROUGE', 'PROTECTION_CIVILE', 'AUTRE_ZONE', 'AUTRE']
+
 export type Presence = 'PRESENT' | 'MALADE' | 'FORMATION' | 'CONGE' | 'RECUP'
 
 export interface Person {
@@ -18,6 +22,7 @@ export interface Person {
   specialites: Specialite[]
   fonctions: Fonction[]
   presence: Presence
+  organisme?: Organisme // renfort externe (absent = personnel SIAMU)
 }
 
 export type Requirement =
@@ -39,9 +44,11 @@ export interface Vehicle {
   nom: string
   court: string // libellé court (mobile, historique)
   section: SectionId
-  groupe?: string // ex. « 1er Départ » : VO + autopompe
+  groupe?: string
+  code?: string // code de type affiché à côté de l'indicatif : AP (autopompe), AE (échelle), VO…
   specialite?: Specialite
   posts: Post[]
+  custom?: boolean // armé pendant la garde (supprimable)
 }
 
 export type VehicleState = 'DISPONIBLE' | 'EN_MISSION' | 'RESERVE' | 'INDISPONIBLE'

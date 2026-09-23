@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { LifeBuoy, Mountain, Radiation, Siren, Waves, type LucideIcon } from 'lucide-react'
-import { GRADE_INITIALS } from '../../domain/selectors'
-import type { Person, PersonStatusKind, Specialite, VehicleState } from '../../domain/types'
+import { GRADE_INITIALS, ORG_META } from '../../domain/selectors'
+import type { Organisme, Person, PersonStatusKind, Specialite, VehicleState } from '../../domain/types'
 import { fmtTime } from '../../lib/time'
 
 /* ----------------------------------------------------------------- Spécialités */
@@ -62,7 +62,7 @@ export function Avatar({ person, size = 'sm', className }: { person: Person; siz
     <span
       className={clsx(
         'inline-grid shrink-0 place-items-center rounded-full font-semibold tracking-tight',
-        GRADE_TONE[person.grade],
+        person.organisme ? ORG_TONE[person.organisme] : GRADE_TONE[person.grade],
         size === 'xs' && 'size-5 text-[8.5px]',
         size === 'sm' && 'size-6 text-[9.5px]',
         size === 'lg' && 'size-14 text-lg',
@@ -70,7 +70,40 @@ export function Avatar({ person, size = 'sm', className }: { person: Person; siz
       )}
       aria-hidden
     >
-      {GRADE_INITIALS[person.grade]}
+      {person.organisme ? ORG_META[person.organisme].court : GRADE_INITIALS[person.grade]}
+    </span>
+  )
+}
+
+/* ----------------------------------------------------------------- Renforts externes */
+
+const ORG_TONE: Record<Organisme, string> = {
+  CROIX_ROUGE: 'bg-white text-red-600 ring-1 ring-red-500',
+  PROTECTION_CIVILE: 'bg-orange-500 text-white',
+  AUTRE_ZONE: 'bg-indigo-600 text-white',
+  AUTRE: 'bg-ink/60 text-white',
+}
+
+/** Badge « Croix-Rouge » etc. — `short` pour une pastille compacte. */
+export function OrgBadge({ org, short, className }: { org: Organisme; short?: boolean; className?: string }) {
+  const m = ORG_META[org]
+  const cr = org === 'CROIX_ROUGE'
+  return (
+    <span
+      title={m.label}
+      className={clsx(
+        'inline-flex h-6 shrink-0 items-center gap-1 rounded-full font-semibold whitespace-nowrap',
+        short ? 'px-1.5 text-[10.5px]' : 'px-2.5 text-[12px]',
+        cr ? 'border border-red-400 bg-white text-red-600' : clsx(ORG_TONE[org], 'ring-0'),
+        className,
+      )}
+    >
+      {cr && (
+        <svg viewBox="0 0 10 10" className="size-2.5" aria-hidden>
+          <path d="M3.5 0h3v3.5H10v3H6.5V10h-3V6.5H0v-3h3.5z" fill="currentColor" />
+        </svg>
+      )}
+      {short ? m.court : m.label}
     </span>
   )
 }

@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import { useNavigate } from 'react-router-dom'
 import { SECTION_META, vehiclesOf } from '../components/board/Sections'
-import { MainAction, StateMenu } from '../components/board/VehicleCard'
+import { IndicatifTag, MainAction, StateMenu } from '../components/board/VehicleCard'
 import { Page } from '../components/layout/Page'
 import { SpecBadge, StatePill, STATE_META } from '../components/ui/badges'
 import { personName } from '../domain/selectors'
@@ -45,8 +45,8 @@ export function Vehicules() {
                     <span className={clsx('h-9 w-1 shrink-0 rounded', STATE_META[st.state].bar)} />
                     <button type="button" onClick={() => { navigate('/'); setTimeout(() => flash(v.id), 60) }} className="w-52 text-left">
                       <span className="block text-[14px] font-semibold text-ink hover:underline">{v.nom}</span>
-                      <span className="block text-[11.5px] text-muted">{v.groupe ?? ''}</span>
                     </button>
+                    <span className="w-32"><IndicatifTag vehicle={v} /></span>
                     <span className="flex w-44 items-center gap-2">
                       <StatePill state={st.state} since={st.since} size="sm" />
                       {st.state === 'EN_MISSION' && st.since && <span className="text-[11.5px] text-mission">{fmtDuration(st.since, now)}</span>}

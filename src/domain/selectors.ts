@@ -1,13 +1,33 @@
-import { VEHICLES } from '../data/seed'
+import { BASE_VEHICLES, VEHICLES } from '../data/seed'
 import {
   GRADE_RANK, SPECIALITES,
-  type Fonction, type Person, type PersonStatus, type Post, type Requirement, type Specialite, type Vehicle, type VehicleStatus,
+  type Fonction, type Organisme, type Person, type PersonStatus, type Post, type Requirement, type Specialite, type Vehicle, type VehicleStatus,
 } from './types'
 
 /* ----------------------------------------------------------------- Index statique */
 
-export const VEHICLE_BY_ID: Record<string, Vehicle> = Object.fromEntries(VEHICLES.map((v) => [v.id, v]))
-export const POST_BY_ID: Record<string, Post> = Object.fromEntries(VEHICLES.flatMap((v) => v.posts.map((p) => [p.id, p])))
+export const VEHICLE_BY_ID: Record<string, Vehicle> = {}
+export const POST_BY_ID: Record<string, Post> = {}
+
+/** Reconstruit le registre (base + véhicules armés pendant la garde). Appelé par le store à chaque changement. */
+export function registerCustomVehicles(custom: Vehicle[]) {
+  VEHICLES.length = 0
+  VEHICLES.push(...BASE_VEHICLES, ...custom)
+  for (const k of Object.keys(VEHICLE_BY_ID)) delete VEHICLE_BY_ID[k]
+  for (const k of Object.keys(POST_BY_ID)) delete POST_BY_ID[k]
+  for (const v of VEHICLES) {
+    VEHICLE_BY_ID[v.id] = v
+    for (const p of v.posts) POST_BY_ID[p.id] = p
+  }
+}
+registerCustomVehicles([])
+
+export const ORG_META: Record<Organisme, { label: string; court: string }> = {
+  CROIX_ROUGE: { label: 'Croix-Rouge', court: 'CR' },
+  PROTECTION_CIVILE: { label: 'Protection civile', court: 'PC' },
+  AUTRE_ZONE: { label: 'Renfort autre zone', court: 'RZ' },
+  AUTRE: { label: 'Autre renfort', court: 'EXT' },
+}
 
 export const vehicleIdOf = (postId: string) => postId.split('.')[0]
 export const vehicleOf = (postId: string) => VEHICLE_BY_ID[vehicleIdOf(postId)]
@@ -27,8 +47,8 @@ export function postShort(postId: string): string {
   return v.section === 'coordination' ? v.nom : `${v.court} · ${p.label}`
 }
 
-export const personName = (p: Person) => `${p.grade} ${p.nom}`
-export const personFull = (p: Person) => `${p.grade} ${p.nom} ${p.prenom.charAt(0)}.`
+// Les renforts externes n'ont pas de grade SIAMU : on affiche le nom et l'initiale du prénom.
+export const personName = (p: Person) => (p.organisme ? `${p.nom} ${p.prenom.charAt(0)}.` : `${p.grade} ${p.nom}`)
 
 export const GRADE_INITIALS: Record<Person['grade'], string> = { SP: 'SP', Cpl: 'CP', Sgt: 'SG', 'Sgt Maj': 'SM', Adj: 'AD' }
 
@@ -74,8 +94,10 @@ export interface Derived {
   status: Record<string, PersonStatus>
   specialiteDispo: Record<Specialite, Person[]>
   specialiteTotal: Record<Specialite, Person[]>
-  presents: Person[]
-  disponibles: Person[]
+  presents: Person[] // personnel SIAMU présent
+  disponibles: Person[] // personnel SIAMU disponible (indicateurs)
+  affectables: Person[] // disponibles + renforts externes (listes d'affectation)
+  externes: Person[]
   enMission: Person[]
   vehiclesOut: Vehicle[]
 }
@@ -103,8 +125,10 @@ export function derive(s: GardeSnapshot): Derived {
     }
   }
 
-  const presents = s.persons.filter((p) => p.presence === 'PRESENT')
+  const externes = s.persons.filter((p) => p.organisme)
+  const presents = s.persons.filter((p) => p.presence === 'PRESENT' && !p.organisme)
   const disponibles = presents.filter((p) => status[p.id].kind !== 'EN_MISSION')
+  const affectables = s.persons.filter((p) => p.presence === 'PRESENT' && status[p.id].kind !== 'EN_MISSION')
   const enMission = s.persons.filter((p) => status[p.id].kind === 'EN_MISSION')
   const specialiteDispo = {} as Record<Specialite, Person[]>
   const specialiteTotal = {} as Record<Specialite, Person[]>
@@ -114,7 +138,7 @@ export function derive(s: GardeSnapshot): Derived {
   }
   const vehiclesOut = VEHICLES.filter((v) => s.vehicleStatus[v.id]?.state === 'EN_MISSION')
 
-  return { personById, status, specialiteDispo, specialiteTotal, presents, disponibles, enMission, vehiclesOut }
+  return { personById, status, specialiteDispo, specialiteTotal, presents, disponibles, affectables, externes, enMission, vehiclesOut }
 }
 
 /* ----------------------------------------------------------------- Alertes */

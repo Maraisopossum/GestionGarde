@@ -7,11 +7,11 @@ import { useDerived } from '../../store/useDerived'
 import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
 import { HighlightBar } from '../board/HighlightBar'
-import { MainAction, StateMenu } from '../board/VehicleCard'
+import { IndicatifTag, MainAction, StateMenu } from '../board/VehicleCard'
 import { PostSlot } from '../board/PostSlot'
-import { SECTION_META, vehiclesOf } from '../board/Sections'
+import { AddVehicleButton, SECTION_META, useVehicleRegistry, vehiclesOf } from '../board/Sections'
 import { AlertBar } from '../layout/AlertBar'
-import { CAP_META, SpecBadge, StatePill, STATE_META } from '../ui/badges'
+import { CAP_META, OrgBadge, SpecBadge, StatePill, STATE_META } from '../ui/badges'
 
 function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
   const [open, setOpen] = useState(false)
@@ -19,6 +19,8 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
   const assignments = useGarde((s) => s.assignments)
   const d = useDerived()
   const flash = useUI((s) => s.flashVehicleId === vehicle.id)
+  const org = useGarde((s) => s.vehicleOrg[vehicle.id])
+  const indicatif = useGarde((s) => s.indicatifs[vehicle.id])
   const crew = vehicle.posts.map((p) => assignments[p.id]).filter(Boolean)
   const specs = [...new Set(crew.flatMap((pid) => d.personById[pid]?.specialites ?? []))] as Specialite[]
   const out = status.state === 'EN_MISSION'
@@ -41,7 +43,11 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={expanded} className="flex w-full items-stretch gap-3 py-2.5 pr-3 pl-0 text-left">
         <span className={clsx('w-1.5 shrink-0 rounded-r', STATE_META[status.state].bar)} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate font-display text-[17px] leading-tight font-semibold tracking-tight text-ink">{title}</span>
+          <span className="flex items-center gap-1.5">
+            <span className="truncate font-display text-[17px] leading-tight font-semibold tracking-tight text-ink">{title}</span>
+            {(vehicle.code || indicatif) && <span className="shrink-0 rounded-full bg-ink/[0.06] px-1.5 text-[11px] font-semibold text-ink/70">{[vehicle.code, indicatif].filter(Boolean).join(' ')}</span>}
+            {org && <OrgBadge org={org} short className="h-5" />}
+          </span>
           <span className="mt-0.5 flex items-center gap-1.5 text-[12px] text-muted">
             <span className={clsx('font-semibold tabular-nums', crew.length < vehicle.posts.length && 'text-reserve')}>
               {crew.length}/{vehicle.posts.length}
@@ -57,6 +63,7 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
       </button>
       {expanded && (
         <div className="space-y-1.5 border-t border-line px-3 pt-2.5 pb-3">
+          <div className="pb-1"><IndicatifTag vehicle={vehicle} /></div>
           {vehicle.posts.map((p) => <PostSlot key={p.id} post={p} locked={out} />)}
           <div className="flex items-center gap-2 pt-1.5">
             <div className="flex-1"><MainAction vehicles={[vehicle]} /></div>
@@ -71,6 +78,7 @@ function VehicleRow({ vehicle, title }: { vehicle: Vehicle; title: string }) {
 function MobileSection({ id, collapsible = false }: { id: SectionId; collapsible?: boolean }) {
   const [open, setOpen] = useState(!collapsible)
   const vehicleStatus = useGarde((s) => s.vehicleStatus)
+  useVehicleRegistry()
   const m = SECTION_META[id]
   const Icon = m.icon
   const list = vehiclesOf(id)
@@ -88,6 +96,7 @@ function MobileSection({ id, collapsible = false }: { id: SectionId; collapsible
         )}
         {collapsible && <ChevronDown className={clsx('ml-auto size-5 text-ink/45', open && 'rotate-180')} />}
       </button>
+      {id !== 'coordination' && <div className="-mt-1 mb-2 flex justify-end"><AddVehicleButton section={id} /></div>}
       {open && (
         id === 'coordination' ? (
           <div className="space-y-1.5 rounded-xl border border-line bg-paper p-3">
@@ -100,7 +109,7 @@ function MobileSection({ id, collapsible = false }: { id: SectionId; collapsible
           </div>
         ) : (
           <div className="space-y-2">
-            {list.map((v) => <VehicleRow key={v.id} vehicle={v} title={v.groupe ? `${v.groupe} · ${v.id.startsWith('vo') ? 'VO' : 'P'}` : v.nom} />)}
+            {list.map((v) => <VehicleRow key={v.id} vehicle={v} title={v.nom} />)}
           </div>
         )
       )}

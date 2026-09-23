@@ -1,18 +1,22 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware'
-import { createSeed } from '../data/seed'
+import { buildVehicles, createSeed, TEMPLATES, type VehicleTemplate } from '../data/seed'
 import {
-  derive, isCoordPost, personName, postLabel, postShort, VEHICLE_BY_ID, vehicleIdOf,
+  derive, isCoordPost, ORG_META, personName, postLabel, postShort, registerCustomVehicles, VEHICLE_BY_ID, vehicleIdOf,
 } from '../domain/selectors'
 import {
-  SPECIALITES, type HistoryEntry, type Mission, type Person, type Presence, type ShiftMode,
-  type VehicleState, type VehicleStatus,
+  SPECIALITES, type HistoryEntry, type Mission, type Organisme, type Person, type Presence, type ShiftMode,
+  type Specialite, type Vehicle, type VehicleState, type VehicleStatus,
 } from '../domain/types'
 import { toast } from './useToasts'
+import { useUI } from './useUI'
 
 const USER = 'Chef de garde'
 
 interface Data {
+  indicatifs: Record<string, string> // indicatif modifiable par véhicule
+  customVehicles: Vehicle[]
+  vehicleOrg: Record<string, Organisme> // véhicule armé par un organisme externe
   persons: Person[]
   assignments: Record<string, string>
   vehicleStatus: Record<string, VehicleStatus>
@@ -30,6 +34,12 @@ interface GardeState extends Data {
   setVehicleState: (vehicleId: string, state: VehicleState) => void
   setPresence: (personId: string, presence: Presence) => void
   setShift: (shift: ShiftMode) => void
+  addVehicle: (tpl: VehicleTemplate, nom: string, org?: Organisme | null, specialite?: Specialite) => string
+  removeVehicle: (vehicleId: string) => void
+  setVehicleOrg: (vehicleId: string, org: Organisme | null) => void
+  addExternal: (p: { nom: string; prenom: string; organisme: Organisme; chauffeur: boolean }, postId?: string) => void
+  removePerson: (personId: string) => void
+  setIndicatif: (vehicleId: string, value: string) => void
   undo: () => void
   reset: () => void
 }
@@ -51,8 +61,8 @@ export const useGarde = create<GardeState>()(
   persist(
     (set, get) => {
       const snapshot = (): Data => {
-        const { persons, assignments, vehicleStatus, missions, history } = get()
-        return { persons, assignments, vehicleStatus, missions, history }
+        const { indicatifs, customVehicles, vehicleOrg, persons, assignments, vehicleStatus, missions, history } = get()
+        return { indicatifs, customVehicles, vehicleOrg, persons, assignments, vehicleStatus, missions, history }
       }
       /** Applique une modification en mémorisant l'état précédent (pour « Annuler »). */
       const commit = (patch: Partial<Data>) =>
@@ -195,6 +205,99 @@ export const useGarde = create<GardeState>()(
 
         setShift: (shift) => set({ shift }),
 
+        addVehicle(tpl, nom, org = null, specialite) {
+          const s = get()
+          const created = buildVehicles(tpl, nom.trim(), `c-${uid()}`, specialite)
+          const vehicleStatus = { ...s.vehicleStatus }
+          const vehicleOrg = { ...s.vehicleOrg }
+          for (const v of created) {
+            vehicleStatus[v.id] = { state: 'DISPONIBLE', since: new Date().toISOString() }
+            if (org) vehicleOrg[v.id] = org
+          }
+          const label = `${nom.trim()}${org ? ` (${ORG_META[org].label})` : ''}`
+          const last = created[created.length - 1].id
+          commit({
+            customVehicles: [...s.customVehicles, ...created],
+            vehicleStatus,
+            vehicleOrg,
+            history: [entry('etat', `Nouveau véhicule armé : ${label} · ${TEMPLATES[tpl].label}`, { vehicleId: last }), ...s.history],
+          })
+          toast('success', `${label} ajouté au tableau`, true)
+          return last
+        },
+
+        removeVehicle(vehicleId) {
+          const s = get()
+          const v = VEHICLE_BY_ID[vehicleId]
+          if (!v?.custom) return
+          if (s.vehicleStatus[vehicleId]?.state === 'EN_MISSION') {
+            toast('warning', 'Véhicule en mission — faites-le revenir avant de le supprimer')
+            return
+          }
+          const assignments = Object.fromEntries(Object.entries(s.assignments).filter(([pid]) => vehicleIdOf(pid) !== vehicleId))
+          const vehicleStatus = { ...s.vehicleStatus }
+          const vehicleOrg = { ...s.vehicleOrg }
+          delete vehicleStatus[vehicleId]
+          delete vehicleOrg[vehicleId]
+          commit({
+            customVehicles: s.customVehicles.filter((x) => x.id !== vehicleId),
+            assignments, vehicleStatus, vehicleOrg,
+            history: [entry('etat', `${v.nom} retiré du tableau`), ...s.history],
+          })
+          toast('success', `${v.nom} retiré du tableau`, true)
+        },
+
+        setVehicleOrg(vehicleId, org) {
+          const s = get()
+          const vehicleOrg = { ...s.vehicleOrg }
+          if (org) vehicleOrg[vehicleId] = org
+          else delete vehicleOrg[vehicleId]
+          const v = VEHICLE_BY_ID[vehicleId]
+          const msg = org ? `${v.nom} armé par ${ORG_META[org].label}` : `${v.nom} de nouveau armé par le SIAMU`
+          commit({ vehicleOrg, history: [entry('etat', msg, { vehicleId }), ...s.history] })
+          toast('success', msg, true)
+        },
+
+        addExternal({ nom, prenom, organisme, chauffeur }, postId) {
+          const s = get()
+          const person: Person = {
+            id: `x-${uid()}`, grade: 'SP', nom: nom.trim(), prenom: prenom.trim() || '—',
+            specialites: [], fonctions: chauffeur ? ['CHAUFFEUR'] : [], presence: 'PRESENT', organisme,
+          }
+          const assignments = { ...s.assignments }
+          if (postId) assignments[postId] = person.id
+          const msg = `Renfort ${ORG_META[organisme].label} : ${personName(person)}${postId ? ` → ${postLabel(postId)}` : ''}`
+          commit({
+            persons: [...s.persons, person], assignments,
+            history: [entry('affectation', msg, { personIds: [person.id], vehicleId: postId ? vehicleIdOf(postId) : undefined }), ...s.history],
+          })
+          toast('success', msg, true)
+        },
+
+        setIndicatif(vehicleId, value) {
+          const s = get()
+          const v = VEHICLE_BY_ID[vehicleId]
+          const val = value.trim().slice(0, 12)
+          if ((s.indicatifs[vehicleId] ?? '') === val) return
+          const indicatifs = { ...s.indicatifs }
+          if (val) indicatifs[vehicleId] = val
+          else delete indicatifs[vehicleId]
+          const msg = `Indicatif ${v.nom} : ${[v.code, val].filter(Boolean).join(' ') || '—'}`
+          commit({ indicatifs, history: [entry('etat', msg, { vehicleId }), ...s.history] })
+          toast('success', msg, true)
+        },
+
+        removePerson(personId) {
+          const s = get()
+          const person = s.persons.find((p) => p.id === personId)
+          if (!person?.organisme) return
+          const assignments = Object.fromEntries(Object.entries(s.assignments).filter(([, who]) => who !== personId))
+          const msg = `${personName(person)} (${ORG_META[person.organisme].label}) quitte la garde`
+          commit({ persons: s.persons.filter((p) => p.id !== personId), assignments, history: [entry('presence', msg), ...s.history] })
+          useUI.getState().openSheet(null)
+          toast('success', msg, true)
+        },
+
         undo() {
           const { past } = get()
           const prev = past[past.length - 1]
@@ -212,13 +315,19 @@ export const useGarde = create<GardeState>()(
     },
     {
       name: 'garde-bxl',
-      version: 1,
+      // v2 : VO R séparées, véhicules armés pendant la garde, renforts externes → la démo repart du nouveau scénario
+      version: 3,
+      migrate: () => ({ ...createSeed(), shift: 'AUTO' }) as unknown as GardeState,
       storage: createJSONStorage(() => safeStorage),
-      partialize: ({ persons, assignments, vehicleStatus, missions, history, shift }) =>
-        ({ persons, assignments, vehicleStatus, missions, history, shift }),
+      partialize: ({ indicatifs, customVehicles, vehicleOrg, persons, assignments, vehicleStatus, missions, history, shift }) =>
+        ({ indicatifs, customVehicles, vehicleOrg, persons, assignments, vehicleStatus, missions, history, shift }),
     },
   ),
 )
+
+// Le registre des véhicules suit l'état (création, suppression, annulation, réhydratation).
+registerCustomVehicles(useGarde.getState().customVehicles)
+useGarde.subscribe((s, prev) => { if (s.customVehicles !== prev.customVehicles) registerCustomVehicles(s.customVehicles) })
 
 export const STATE_LABEL: Record<VehicleState, string> = {
   DISPONIBLE: 'Disponible', EN_MISSION: 'En mission', RESERVE: 'Réserve', INDISPONIBLE: 'Indisponible',

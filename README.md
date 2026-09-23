@@ -7,7 +7,10 @@ Maquette d'interface web destinée à remplacer le tableau magnétique de garde.
 
 ## Ce que la maquette permet
 
-- **Tableau de garde** : Incendie (départs VO + autopompe, échelles, AMB INC), Ambulances, Véhicules techniques, Coordination.
+- **Tableau de garde** : Incendie (Départs P — autopompes AP, Voitures Officier R — VO, échelles AE, AMB INC), Ambulances, Véhicules techniques, Coordination.
+- **Armer un véhicule** depuis le tableau (bouton « + Armer » de chaque section) : nouveau départ P, VO, échelle, ambulance, véhicule technique.
+- **Indicatifs** modifiables d'un clic à côté du code de type (AP, AE, VO…).
+- **Renforts externes** : véhicule « armé par » la Croix-Rouge, la Protection civile, une autre zone… et équipiers externes ajoutés directement sur un poste (non comptés dans les indicateurs SIAMU).
 - **Indicateurs** en en-tête : personnel disponible, véhicules en mission, plongeurs / HAZMAT / RISC / GRIMP disponibles (rouge à 0, orange à 1).
 - **Sortir / faire revenir** un véhicule en un clic : l'équipage passe « en mission », les compteurs se mettent à jour.
 - **Glisser-déposer** du personnel vers un poste, entre postes (dépôt sur un poste occupé = permutation) ou vers le panneau (= libérer le poste). Les postes incompatibles sont grisés.
@@ -21,7 +24,7 @@ Les manipulations sont conservées dans le navigateur ; *Paramètres → Réinit
 
 ## Hypothèses à valider
 
-Les règles de qualification sont des hypothèses de travail : N°6 ≥ Sgt, N°5 et chauffeurs = qualification Chauffeur, Plong. 1/2 = spécialité Plongeur, chef d'échelle ≥ Cpl, Adj 1-3 = Adj, fonctions « Sgt … » ≥ Sgt.
+VO R = Voiture Officier « Rouge », véhicule distinct de l'autopompe (AP). Les règles de qualification sont des hypothèses de travail : N°6 ≥ Sgt, N°5 et chauffeurs = qualification Chauffeur, Plong. 1/2 = spécialité Plongeur, chef d'échelle ≥ Cpl, Adj 1-3 = Adj, fonctions « Sgt … » ≥ Sgt.
 Une fonction de coordination peut se cumuler avec un poste véhicule (comme sur le tableau actuel) ; un seul poste véhicule par personne.
 
 ## Développement

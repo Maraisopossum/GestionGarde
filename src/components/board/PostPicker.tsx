@@ -1,13 +1,13 @@
 import clsx from 'clsx'
-import { ArrowLeftRight, Lock, Search, UserMinus, UserRound, X } from 'lucide-react'
+import { ArrowLeftRight, Lock, Search, UserMinus, UserPlus, UserRound, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { checkPost, isCoordPost, personName, POST_BY_ID, postLabel, postShort, vehicleOf } from '../../domain/selectors'
-import { GRADE_RANK, type Person } from '../../domain/types'
+import { checkPost, isCoordPost, ORG_META, personName, POST_BY_ID, postLabel, postShort, vehicleOf } from '../../domain/selectors'
+import { GRADE_RANK, ORGANISMES, type Organisme, type Person } from '../../domain/types'
 import { useIsMobile } from '../../lib/useMedia'
 import { useDerived } from '../../store/useDerived'
 import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
-import { Avatar, SpecBadges } from '../ui/badges'
+import { Avatar, OrgBadge, SpecBadges } from '../ui/badges'
 
 /** Affectation avec confirmation si la personne n'a pas la qualification requise. */
 export function useAssign() {
@@ -39,7 +39,7 @@ function CandidateList({ postId, onDone }: { postId: string; onDone: () => void 
     // Poste d'encadrement : grades élevés d'abord ; sinon on évite de mobiliser un gradé.
     const senior = (POST_BY_ID[postId]?.requires ?? []).some((r) => r.kind === 'grade' || (r.kind === 'fonction' && r.value === 'CHEF'))
     const dir = senior ? 1 : -1
-    return d.disponibles
+    return d.affectables
       .filter((p) => p.id !== occupant)
       .filter((p) => !needle || `${p.grade} ${p.nom} ${p.prenom} ${p.specialites.join(' ')}`.toLowerCase().includes(needle))
       .map((p) => ({ p, ok: checkPost(p, postId).ok, st: d.status[p.id] }))
@@ -82,6 +82,7 @@ function CandidateList({ postId, onDone }: { postId: string; onDone: () => void 
                 <span className="min-w-0 flex-1">
                   <span className="flex items-center gap-1.5">
                     <span className="truncate text-[13px] font-semibold text-ink">{personName(p)}</span>
+                    {p.organisme && <OrgBadge org={p.organisme} short className="h-5" />}
                     <SpecBadges specs={p.specialites} variant="icon" />
                   </span>
                   <span className={clsx('block truncate text-[11.5px]', !ok ? 'text-reserve' : hint === 'Libre' ? 'text-ok' : 'text-muted')}>
@@ -94,7 +95,55 @@ function CandidateList({ postId, onDone }: { postId: string; onDone: () => void 
           )
         })}
       </ul>
+      {!coord && <ExternalForm postId={postId} onDone={onDone} />}
     </div>
+  )
+}
+
+/** Ajout d'un équipier externe (Croix-Rouge, Protection civile…) directement sur le poste. */
+function ExternalForm({ postId, onDone }: { postId: string; onDone: () => void }) {
+  const vehicleOrgOf = useGarde((s) => s.vehicleOrg[vehicleOf(postId).id])
+  const addExternal = useGarde((s) => s.addExternal)
+  const needsDriver = (POST_BY_ID[postId]?.requires ?? []).some((r) => r.kind === 'fonction' && r.value === 'CHAUFFEUR')
+  const [open, setOpen] = useState(false)
+  const [nom, setNom] = useState('')
+  const [prenom, setPrenom] = useState('')
+  const [org, setOrg] = useState<Organisme>(vehicleOrgOf ?? 'CROIX_ROUGE')
+  const [chauffeur, setChauffeur] = useState(needsDriver)
+  if (!open)
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-2 border-t border-line px-3 py-2.5 text-left text-[13px] text-ink/70 hover:bg-ink/[0.03] hover:text-ink">
+        <UserPlus className="size-4" /> Ajouter un renfort externe
+        <span className="ml-auto text-[11.5px] text-ink/40">Croix-Rouge…</span>
+      </button>
+    )
+  const input = 'h-9 w-full rounded-md border border-line bg-paper px-2.5 text-[13.5px] outline-none focus:border-sky-500'
+  return (
+    <form
+      onSubmit={(e) => { e.preventDefault(); if (!nom.trim()) return; addExternal({ nom, prenom, organisme: org, chauffeur }, postId); onDone() }}
+      className="space-y-2 border-t border-line bg-canvas px-3 py-3"
+    >
+      <p className="text-[12.5px] font-semibold text-ink">Renfort externe sur ce poste</p>
+      <div className="flex flex-wrap gap-1">
+        {ORGANISMES.map((o) => (
+          <button key={o} type="button" onClick={() => setOrg(o)} className={clsx('h-7 rounded-full border px-2.5 text-[12px]', org === o ? 'border-ink bg-ink text-paper' : 'border-line bg-paper text-ink/75')}>
+            {ORG_META[o].label}
+          </button>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <input autoFocus value={nom} onChange={(e) => setNom(e.target.value)} placeholder="Nom" className={input} />
+        <input value={prenom} onChange={(e) => setPrenom(e.target.value)} placeholder="Prénom" className={input} />
+      </div>
+      <label className="flex items-center gap-2 text-[12.5px] text-ink/80">
+        <input type="checkbox" checked={chauffeur} onChange={(e) => setChauffeur(e.target.checked)} className="size-4 accent-ink" />
+        Peut conduire (qualification Chauffeur)
+      </label>
+      <div className="flex justify-end gap-2">
+        <button type="button" onClick={() => setOpen(false)} className="h-8 rounded-full px-3 text-[13px] text-muted hover:bg-ink/[0.04]">Annuler</button>
+        <button type="submit" disabled={!nom.trim()} className="h-8 rounded-full bg-ink px-3.5 text-[13px] font-semibold text-paper shadow-inset disabled:opacity-40">Ajouter</button>
+      </div>
+    </form>
   )
 }
 

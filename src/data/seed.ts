@@ -1,6 +1,6 @@
 // Données 100 % fictives — aucun nom ne correspond à un membre réel du personnel.
 import type {
-  Fonction, Grade, HistoryEntry, Mission, Person, Post, Presence, Requirement, SectionId,
+  Fonction, Grade, HistoryEntry, Mission, Organisme, Person, Post, Presence, Requirement, SectionId,
   Specialite, Vehicle, VehicleStatus,
 } from '../domain/types'
 
@@ -94,7 +94,7 @@ type PostDef = [code: string, label: string, req?: Requirement[]]
 
 function vehicle(
   id: string, nom: string, court: string, section: SectionId, posts: PostDef[],
-  extra: Partial<Pick<Vehicle, 'groupe' | 'specialite'>> = {},
+  extra: Partial<Pick<Vehicle, 'groupe' | 'specialite' | 'code'>> = {},
 ): Vehicle {
   return {
     id, nom, court, section, ...extra,
@@ -106,10 +106,11 @@ const CHAUF_CONV: PostDef[] = [['CHAUF', 'Chauf.', [R.chauf]], ['CONV', 'Conv.']
 const AUTOPOMPE: PostDef[] = [
   ['N6', 'N°6', [R.sgt]], ['N5', 'N°5', [R.chauf]], ['N1', 'N°1'], ['N2', 'N°2'], ['N3', 'N°3'], ['N4', 'N°4'],
 ]
+const VO_R: PostDef[] = [['CHAUF', 'Chauf.', [R.chauf]]]
 const coord = (id: string, nom: string, req?: Requirement[]) =>
   vehicle(id, nom, nom, 'coordination', [['X', nom, req]])
 
-export const VEHICLES: Vehicle[] = [
+export const BASE_VEHICLES: Vehicle[] = [
   // Coordination — rangées comme sur le tableau physique
   coord('adj1', 'Adj 1', [R.adj]), coord('adj2', 'Adj 2', [R.adj]), coord('adj3', 'Adj 3', [R.adj]),
   coord('chefat', 'Chef Atelier', [R.sgt]),
@@ -120,15 +121,16 @@ export const VEHICLES: Vehicle[] = [
   coord('labo1', 'Labo Masque 1'), coord('labo2', 'Labo Masque 2'),
 
   // Incendie
-  vehicle('vo1', '1e Voiture Officier R', '1e VO', 'incendie', [['CHAUF', 'Chauf.', [R.chauf]]], { groupe: '1er Départ' }),
-  vehicle('p1', '1e Départ P', '1e P', 'incendie', AUTOPOMPE, { groupe: '1er Départ' }),
-  vehicle('vo2', '2e Voiture Officier R', '2e VO', 'incendie', [['CHAUF', 'Chauf.', [R.chauf]]], { groupe: '2e Départ' }),
-  vehicle('p2', '2e Départ P', '2e P', 'incendie', AUTOPOMPE, { groupe: '2e Départ' }),
-  vehicle('vo3', '3e Voiture Officier R', '3e VO', 'incendie', [['CHAUF', 'Chauf.', [R.chauf]]], { groupe: '3e Départ' }),
-  vehicle('p3', '3e Départ P', '3e P', 'incendie', AUTOPOMPE, { groupe: '3e Départ' }),
-  vehicle('ech1', '1e Échelle', '1e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']]),
-  vehicle('ech2', '2e Échelle', '2e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']]),
-  vehicle('ech3', '3e Échelle', '3e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']]),
+  // VO R = Voiture Officier « Rouge », véhicule distinct de l'autopompe (Départ P)
+  vehicle('vo1', '1e Voiture Officier R', '1e VO R', 'incendie', VO_R, { code: 'VO' }),
+  vehicle('vo2', '2e Voiture Officier R', '2e VO R', 'incendie', VO_R, { code: 'VO' }),
+  vehicle('vo3', '3e Voiture Officier R', '3e VO R', 'incendie', VO_R, { code: 'VO' }),
+  vehicle('p1', '1e Départ P', '1e P', 'incendie', AUTOPOMPE, { code: 'AP' }),
+  vehicle('p2', '2e Départ P', '2e P', 'incendie', AUTOPOMPE, { code: 'AP' }),
+  vehicle('p3', '3e Départ P', '3e P', 'incendie', AUTOPOMPE, { code: 'AP' }),
+  vehicle('ech1', '1e Échelle', '1e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']], { code: 'AE' }),
+  vehicle('ech2', '2e Échelle', '2e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']], { code: 'AE' }),
+  vehicle('ech3', '3e Échelle', '3e Éch.', 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']], { code: 'AE' }),
   vehicle('ambinc', 'AMB INC', 'AMB INC', 'incendie', CHAUF_CONV),
 
   // Ambulances
@@ -151,6 +153,39 @@ export const VEHICLES: Vehicle[] = [
   vehicle('c34', 'Petit Service C34 / T10', 'C34', 'techniques', CHAUF_CONV),
   vehicle('t20', 'Grue T20 / P1', 'T20', 'techniques', CHAUF_CONV),
 ]
+
+/**
+ * Registre courant des véhicules : base + véhicules armés pendant la garde.
+ * Mis à jour en place par `registerCustomVehicles` (domain/selectors) à chaque changement.
+ */
+export const VEHICLES: Vehicle[] = [...BASE_VEHICLES]
+
+/* --------------------------------------------------------------- Gabarits */
+
+export type VehicleTemplate = 'VO' | 'DEPART' | 'ECHELLE' | 'AMB_INC' | 'AMBULANCE' | 'TECHNIQUE'
+
+export const TEMPLATES: Record<VehicleTemplate, { label: string; section: SectionId; hint: string }> = {
+  VO: { label: 'Voiture Officier R (VO)', section: 'incendie', hint: 'Chauf.' },
+  DEPART: { label: 'Départ P — autopompe (AP)', section: 'incendie', hint: 'N°6, N°5, N°1 à N°4' },
+  ECHELLE: { label: 'Échelle (AE)', section: 'incendie', hint: 'Chef, Conv.' },
+  AMB_INC: { label: 'AMB INC', section: 'incendie', hint: 'Chauf., Conv.' },
+  AMBULANCE: { label: 'Ambulance', section: 'ambulances', hint: 'Chauf., Conv.' },
+  TECHNIQUE: { label: 'Véhicule technique', section: 'techniques', hint: 'Chauf., Conv.' },
+}
+
+/** Construit le véhicule d'un gabarit. */
+export function buildVehicles(tpl: VehicleTemplate, nom: string, id: string, specialite?: Specialite): Vehicle[] {
+  const court = nom.length > 14 ? nom.slice(0, 13) + '…' : nom
+  const x = { custom: true }
+  switch (tpl) {
+    case 'VO': return [{ ...vehicle(id, nom, court, 'incendie', VO_R, { code: 'VO' }), ...x }]
+    case 'DEPART': return [{ ...vehicle(id, nom, court, 'incendie', AUTOPOMPE, { code: 'AP' }), ...x }]
+    case 'ECHELLE': return [{ ...vehicle(id, nom, court, 'incendie', [['CHEF', 'Chef', [R.cpl]], ['CONV', 'Conv.']], { code: 'AE' }), ...x }]
+    case 'AMB_INC': return [{ ...vehicle(id, nom, court, 'incendie', CHAUF_CONV), ...x }]
+    case 'AMBULANCE': return [{ ...vehicle(id, nom, court, 'ambulances', CHAUF_CONV), ...x }]
+    case 'TECHNIQUE': return [{ ...vehicle(id, nom, court, 'techniques', CHAUF_CONV, { specialite }), ...x }]
+  }
+}
 
 /* ------------------------------------------------------------ Scénario initial */
 
@@ -188,6 +223,9 @@ const SEED_ASSIGN: Record<string, string> = {
 const minutesAgo = (now: Date, m: number) => new Date(now.getTime() - m * 60_000).toISOString()
 
 export interface SeedState {
+  indicatifs: Record<string, string>
+  customVehicles: Vehicle[]
+  vehicleOrg: Record<string, Organisme>
   persons: Person[]
   assignments: Record<string, string>
   vehicleStatus: Record<string, VehicleStatus>
@@ -196,8 +234,16 @@ export interface SeedState {
 }
 
 export function createSeed(now = new Date()): SeedState {
+  // Exemple de renfort : une ambulance armée par la Croix-Rouge (équipage externe)
+  const customVehicles = buildVehicles('AMBULANCE', 'Ambulance Croix-Rouge 1', 'c-cr1')
+  const vehicleOrg: Record<string, Organisme> = { 'c-cr1': 'CROIX_ROUGE' }
+  const externes: Person[] = [
+    { id: 'x-cr-janssen', grade: 'SP', nom: 'Verbeke', prenom: 'Anna', specialites: [], fonctions: ['CHAUFFEUR'], presence: 'PRESENT', organisme: 'CROIX_ROUGE' },
+    { id: 'x-cr-leroy', grade: 'SP', nom: 'Masson', prenom: 'Hugo', specialites: [], fonctions: [], presence: 'PRESENT', organisme: 'CROIX_ROUGE' },
+  ]
+
   const vehicleStatus: Record<string, VehicleStatus> = {}
-  for (const v of VEHICLES) vehicleStatus[v.id] = { state: 'DISPONIBLE' }
+  for (const v of [...BASE_VEHICLES, ...customVehicles]) vehicleStatus[v.id] = { state: 'DISPONIBLE' }
   const out: Record<string, number> = { t20: 175, amb2: 130, vo2: 87, p2: 87, t13: 42 }
   for (const [id, m] of Object.entries(out)) vehicleStatus[id] = { state: 'EN_MISSION', since: minutesAgo(now, m) }
   vehicleStatus.ech3 = { state: 'RESERVE', since: minutesAgo(now, 200) }
@@ -215,10 +261,12 @@ export function createSeed(now = new Date()): SeedState {
     ({ id: `seed-${n++}`, at: minutesAgo(now, m), kind, text, by, ...extra })
 
   const history: HistoryEntry[] = [
+    h(1, 'affectation', 'Ambulance Croix-Rouge 1 armée en renfort (Croix-Rouge)', 'Chef de garde', { vehicleId: 'c-cr1' }),
     h(3, 'affectation', 'SP Mathieu → N°5 (3e Départ P)', 'Chef de garde', { personIds: ['mathieu'], vehicleId: 'p3' }),
     h(12, 'affectation', 'Sgt Maj Dubois → Sgt Chf', 'Chef de garde', { personIds: ['dubois'] }),
     h(42, 'sortie', 'Plongeur T13 / C12 sorti en intervention', 'CTA', { vehicleId: 't13' }),
-    h(87, 'sortie', '2e Départ (VO + P) sorti en intervention', 'CTA', { vehicleId: 'p2' }),
+    h(87, 'sortie', '2e Départ P sorti en intervention', 'CTA', { vehicleId: 'p2' }),
+    h(87, 'sortie', '2e Voiture Officier R sortie en intervention', 'CTA', { vehicleId: 'vo2' }),
     h(110, 'affectation', 'Cpl Van Damme → Conv. (AMB INC)', 'Chef de garde', { personIds: ['vandamme'], vehicleId: 'ambinc' }),
     h(130, 'sortie', '2e Ambulance sortie en intervention', 'CTA', { vehicleId: 'amb2' }),
     h(150, 'retour', '1e Ambulance de retour — disponible', 'CTA', { vehicleId: 'amb1' }),
@@ -229,5 +277,15 @@ export function createSeed(now = new Date()): SeedState {
     h(215, 'systeme', 'Prise de garde — tableau initialisé', 'Système'),
   ]
 
-  return { persons: seedPersons(), assignments: { ...SEED_ASSIGN }, vehicleStatus, missions, history }
+  return {
+    // Indicatifs fictifs — modifiables directement sur les cartes
+    indicatifs: { p1: '11', p2: '12', p3: '13', ech1: '31', ech2: '32', ech3: '33', vo1: '01', vo2: '02', vo3: '03' },
+    customVehicles,
+    vehicleOrg,
+    persons: [...seedPersons(), ...externes],
+    assignments: { ...SEED_ASSIGN, 'c-cr1.CHAUF': 'x-cr-janssen', 'c-cr1.CONV': 'x-cr-leroy' },
+    vehicleStatus,
+    missions,
+    history,
+  }
 }

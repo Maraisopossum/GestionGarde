@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { ChevronDown, Siren, UserMinus, X } from 'lucide-react'
+import { ChevronDown, LogOut, Siren, UserMinus, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { VEHICLES } from '../../data/seed'
-import { checkPost, postLabel, POST_BY_ID, PRESENCE_LABEL, VEHICLE_BY_ID, vehicleIdOf } from '../../domain/selectors'
+import { checkPost, ORG_META, postLabel, POST_BY_ID, PRESENCE_LABEL, VEHICLE_BY_ID, vehicleIdOf } from '../../domain/selectors'
 import type { Person, Presence } from '../../domain/types'
 import { fmtDuration, fmtTime, useNow } from '../../lib/time'
 import { useIsMobile } from '../../lib/useMedia'
@@ -10,7 +10,7 @@ import { useDerived } from '../../store/useDerived'
 import { useGarde } from '../../store/useGarde'
 import { useUI } from '../../store/useUI'
 import { useAssign } from '../board/PostPicker'
-import { Avatar, SpecBadge } from '../ui/badges'
+import { Avatar, OrgBadge, SpecBadge } from '../ui/badges'
 
 const PRESENCES: Presence[] = ['PRESENT', 'MALADE', 'FORMATION', 'CONGE', 'RECUP']
 
@@ -86,6 +86,7 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
   const history = useGarde((s) => s.history)
   const unassign = useGarde((s) => s.unassign)
   const setPresence = useGarde((s) => s.setPresence)
+  const removePerson = useGarde((s) => s.removePerson)
   const flashVehicle = useUI((s) => s.flashVehicle)
   const st = d.status[person.id]
   const mine = history.filter((h) => h.personIds?.includes(person.id) || (h.vehicleId && st.vehiclePosts.some((p) => vehicleIdOf(p) === h.vehicleId) && h.kind === 'sortie')).slice(0, 8)
@@ -107,7 +108,7 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
       <header className="flex items-start gap-3 border-b border-line p-4">
         <Avatar person={person} size="lg" />
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold tracking-wider text-muted uppercase">{person.grade}</p>
+          {person.organisme ? <OrgBadge org={person.organisme} /> : <p className="text-[12px] font-semibold tracking-wider text-muted uppercase">{person.grade}</p>}
           <h2 className="truncate font-display text-[26px] leading-tight font-semibold tracking-tight text-ink">{person.nom}</h2>
           <p className="text-[13px] text-muted">{person.prenom}</p>
         </div>
@@ -144,6 +145,15 @@ function SheetBody({ person, onClose }: { person: Person; onClose: () => void })
           )}
           {st.kind !== 'EN_MISSION' && st.kind !== 'ABSENT' && <div className="mt-2"><PostChooser person={person} /></div>}
         </section>
+
+        {person.organisme && (
+          <section className="rounded-xl border border-line bg-canvas px-3 py-2.5">
+            <p className="text-[13px] text-ink/80">Renfort externe — {ORG_META[person.organisme].label}. Non comptabilisé dans les indicateurs SIAMU.</p>
+            <button type="button" onClick={() => removePerson(person.id)} className="mt-2 flex h-8 items-center gap-1.5 rounded-full border border-ink/40 px-3 text-[12.5px] text-ink hover:bg-ink/[0.04]">
+              <LogOut className="size-4" /> Retirer de la garde
+            </button>
+          </section>
+        )}
 
         <section>
           <h3 className="mb-2 text-[11px] font-semibold tracking-wider text-muted uppercase">Spécialités</h3>

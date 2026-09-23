@@ -7,7 +7,7 @@ import { GRADE_RANK, SPECIALITES, type Person, type PersonStatus } from '../../d
 import { useDerived } from '../../store/useDerived'
 import { useUI, type CapFilter, type StatusFilter } from '../../store/useUI'
 import type { DragData } from '../board/PostSlot'
-import { Avatar, CAP_META, MissionTag, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../ui/badges'
+import { Avatar, CAP_META, MissionTag, OrgBadge, PERSON_STATUS_META, SPEC_META, SpecBadges } from '../ui/badges'
 
 const STATUS_TABS: { id: StatusFilter; label: string }[] = [
   { id: 'DISPO', label: 'Disponibles' },
@@ -95,6 +95,7 @@ function PersonRow({ person }: { person: Person }) {
           </span>
         </span>
         {st.kind === 'EN_MISSION' && <MissionTag />}
+        {person.organisme && <OrgBadge org={person.organisme} short />}
         <SpecBadges specs={person.specialites} />
         {movable && <GripVertical className="size-4 shrink-0 text-ink/30 opacity-0 group-hover:opacity-100" />}
       </button>

@@ -12,7 +12,8 @@ export function useDerived(): Result {
   const persons = useGarde((s) => s.persons)
   const assignments = useGarde((s) => s.assignments)
   const vehicleStatus = useGarde((s) => s.vehicleStatus)
-  const key = [persons, assignments, vehicleStatus]
+  const customVehicles = useGarde((s) => s.customVehicles)
+  const key = [persons, assignments, vehicleStatus, customVehicles]
   if (!cache || cache.key.some((k, i) => k !== key[i])) {
     const snap = { persons, assignments, vehicleStatus }
     const d = derive(snap)
